@@ -3,5 +3,23 @@ import { defineConfig } from 'vite'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [react()],
-})
+ base: "/",
+ plugins: [react()],
+ preview: {
+  //Change to our app port 300
+  port: 3000,
+  strictPort: true,
+ },
+ server: {
+  host: true,
+  port: 8080,
+  strictPort: true,
+  //Add proxy to link up express backend with app https://vite.dev/config/server-options
+  proxy: {
+    '/api': {
+      target: process.env.API_PROXY_TARGET || 'http://localhost:8080',
+      rewrite: (path) => path.replace(/^\/api/, ''),
+    },
+  },
+ },
+});
