@@ -6,13 +6,13 @@ export default defineConfig({
  base: "/",
  plugins: [react()],
  preview: {
-  //Change to our app port 300
+  //Change to our app port 3000
   port: 3000,
   strictPort: true,
  },
  server: {
   host: true,
-  port: 8080,
+  port: 3000,
   strictPort: true,
   //Add proxy to link up express backend with app https://vite.dev/config/server-options
   proxy: {

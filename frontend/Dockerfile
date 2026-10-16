@@ -1,11 +1,11 @@
 #Copied from https://thedkpatel.medium.com/dockerizing-react-application-built-with-vite-a-simple-guide-4c41eb09defa
 
 # upated node version to 22
-FROM node:22-alpine
+FROM node:22-alpine AS development
 #changed to /code to match project setup
 WORKDIR /code 
-
-COPY package.json ./
+# make sure it gets package-lock.json and package.json
+COPY package*.json ./
 RUN npm ci
 
 COPY . .
