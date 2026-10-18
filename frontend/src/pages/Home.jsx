@@ -63,6 +63,37 @@ export default function Home() {
                     Log In
                 </Link> 
             </header>
+             {/* ------------------------------ */}
+             {/* HERO SECTION                   */}
+             {/* ------------------------------ */}
+             <main className="w-full max-w-md md:max-w-xl flex-1 flex flex-col items-stretch text-left">
+
+                {/* Main Title & Subtitle */}
+                <section className="mb-6">
+                    <h1 className="text-3xl md:text-4xl font-extrabold tracking-tight mb-3 leading-tight text-[var(--color-charcoal)]">
+                        Track Your Impact, <br />
+                        <span className="text-[var(--color-forest)]">Build a Greener <br className="hidden md:block"/>Future</span>
+                    </h1>
+                    <p className="text-[var(--color-charcoal-muted)] text-sm md:text-base leading-relaxed">
+                        Join thousands reducing their carbon footprint through daily habits, community challenges, and actionable energy insights.
+                    </p>
+                </section>
+
+                {/* Hero Card */}
+                <div>
+                    Image/SVG Space            
+                </div>
+
+                {/* Primary CTA Button */}
+                <Link
+                    to="/register"
+                    className="w-75 py-4 bg-forest hover:bg-forest text-white text-center font-bold text-base rounded-2xl shadow-md transition-all active:scale-[0.98] mb-8">
+                    Get Started - It's Free
+                </Link>
+
+             </main>
         </div>
+
+       
     )
 }
