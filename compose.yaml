@@ -58,6 +58,12 @@ services:
       - public
     depends_on:
       - backend
+  ml:
+    build: ml-service
+    ports:
+      - 8000:8000
+    networks:
+      - private
 networks:
   public:
   private:
