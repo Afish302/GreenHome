@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>GreenHome integration demo</title>
+<link rel="stylesheet" href="font.css">
+<style>
+:root{--paper:#EDF1EC; --ink:#17241D; --muted:#5D6D63; --rule:#B9C4BB; --forest:#2E7D32}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{display:flex;flex-direction:column;background:var(--paper);color:var(--ink);font:15px/1.45 "Instrument Sans",system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+button{font:inherit}
+:focus-visible{outline:2px solid var(--forest);outline-offset:3px}
+
+header{display:flex;justify-content:space-between;align-items:center;gap:24px;padding:14px 32px}
+.brand{display:flex;align-items:center;gap:9px;font-weight:700;font-size:18px;letter-spacing:-.01em}
+.brand svg{width:22px;height:22px}
+.brand small{margin-left:12px;font-size:14px;font-weight:400;color:var(--muted);letter-spacing:0}
+.reset{border:1px solid var(--rule);border-radius:8px;padding:6px 12px;background:transparent;color:var(--ink);cursor:pointer}
+.reset:hover{background:#E2E8E1}
+
+main{flex:1;min-height:0;display:flex;padding:0 32px 20px}
+.home{flex:1;min-width:0;border:0;border-radius:16px}
+.phone{width:400px;flex:none;border:9px solid var(--ink);border-radius:34px;background:#F8F9FA}
+
+.lanes{width:132px;flex:none;display:flex;flex-direction:column;justify-content:center;gap:64px;padding:0 14px;text-align:center;font-size:13px;color:var(--muted)}
+.lane b{display:block;color:var(--ink);font-weight:600;transition:color .3s}
+.track{position:relative;height:2px;margin:10px 0;background:var(--rule)}
+.track::after{content:"";position:absolute;top:-4px;border:5px solid transparent}
+.read .track::after{right:-2px;border-left-color:var(--rule);border-right:0}
+.cmd .track::after{left:-2px;border-right-color:var(--rule);border-left:0}
+.dot{position:absolute;top:-4px;width:10px;height:10px;border-radius:50%;background:var(--forest);opacity:0}
+.read.go .dot{animation:right .7s ease-in-out}
+.cmd.go .dot{animation:left .7s ease-in-out}
+.lane.go b{color:var(--forest)}
+@keyframes right{0%{left:0;opacity:1}90%{opacity:1}100%{left:calc(100% - 10px);opacity:0}}
+@keyframes left{0%{left:calc(100% - 10px);opacity:1}90%{opacity:1}100%{left:0;opacity:0}}
+
+@media (max-width:1000px){
+  main{flex-direction:column;gap:16px;padding:0 16px 16px}
+  .home{min-height:80vh}
+  .phone{width:100%;max-width:400px;height:80vh;align-self:center}
+  .lanes{display:none}
+  header{padding:14px 16px}
+}
+@media (prefers-reduced-motion:reduce){.dot{display:none}}
+</style>
+</head>
+<body>
+<header>
+  <div class="brand">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20C4 11 9.5 4.5 20 4c-.3 10.5-6.5 16-16 16z" fill="#2E7D32"/><path d="M4.5 19.5 13 11" stroke="#EDF1EC" stroke-width="1.6" stroke-linecap="round"/></svg>
+    GreenHome<small>Integration demo with simulated data</small>
+  </div>
+  <button class="reset" id="reset">Start again</button>
+</header>
+
+<main>
+  <iframe class="home" src="household.html" title="Simulated home"></iframe>
+  <div class="lanes" aria-hidden="true">
+    <div class="lane read" id="read"><b>Readings</b><div class="track"><span class="dot"></span></div>Lights and meter</div>
+    <div class="lane cmd" id="cmd"><b>Commands</b><div class="track"><span class="dot"></span></div>Switch off, reschedule</div>
+  </div>
+  <iframe class="phone" src="app.html" title="GreenHome app"></iframe>
+</main>
+
+<script>
+// Listen on the same channel the two pages use and pulse the lane each message travels along.
+const pulse = el => { el.classList.remove('go'); void el.offsetWidth; el.classList.add('go'); };
+new BroadcastChannel('greenhome-demo').onmessage = ({data}) => {
+  if (data.type === 'state') pulse(document.getElementById('read'));
+  else if (data.type !== 'hello') pulse(document.getElementById('cmd'));
+};
+document.getElementById('reset').onclick = () => location.reload();
+</script>
+</body>
+</html>

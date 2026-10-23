@@ -1,0 +1,271 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Simulated home</title>
+<link rel="stylesheet" href="font.css">
+<style>
+:root{--paper:#EDF1EC; --ink:#17241D; --muted:#5D6D63; --rule:#CBD5CC; --forest:#2E7D32; --lamp:#FFD27A}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--paper);color:var(--ink);font:15px/1.45 "Instrument Sans",system-ui,sans-serif;font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased}
+button{font:inherit}
+:focus-visible{outline:2px solid var(--forest);outline-offset:3px}
+
+.wrap{max-width:max(480px,calc((100vh - 190px) * 1.4545));margin:0 auto;padding:20px 24px}
+header{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:14px}
+h1{margin:0;font-size:20px;font-weight:600;letter-spacing:-.01em}
+header p{margin:2px 0 0;color:var(--muted);font-size:14px}
+.devices{display:flex;gap:22px;margin:0;font-size:13px}
+.devices dt{font-weight:600}
+.devices dd{margin:0;color:var(--muted);display:flex;align-items:center;gap:6px}
+.devices dd::before{content:"";width:7px;height:7px;border-radius:50%;background:#9AA6AF}
+.devices dd.ok{color:var(--forest)}
+.devices dd.ok::before{background:var(--forest)}
+.devices dd.wait::before{background:#3D8BD9;animation:blink .8s steps(2) infinite}
+
+figure{position:relative;margin:0;border-radius:16px;overflow:hidden;background:#1A2533}
+figure svg{display:block;width:100%;height:auto}
+.banner{position:absolute;left:50%;top:16px;transform:translateX(-50%);display:flex;align-items:center;gap:14px;padding:8px 8px 8px 16px;border-radius:12px;background:#F7F9F6;box-shadow:0 6px 24px rgba(10,20,30,.35);white-space:nowrap}
+.banner[hidden]{display:none}
+.banner button{border:0;border-radius:8px;padding:7px 12px;background:var(--ink);color:#fff;font-weight:600;cursor:pointer}
+
+.room{cursor:pointer;outline:none}
+.room .base{fill:#34424F}
+.room .lit{fill:#F6E5BF;opacity:0;transition:opacity .6s}
+.room .glow{opacity:0;transition:opacity .6s}
+.room .bulb{fill:#56636F;transition:fill .4s}
+.room.on .bulb{fill:var(--lamp)}
+.room .fix{fill:#1A242C;stroke:#1A242C}
+.room .furn{opacity:.34}
+.room .furn *{fill:#0C141A}
+.room .win{fill:#3F556C;stroke:#D8D2C4;stroke-width:2}
+.room .mull{stroke:#D8D2C4;stroke-width:1.5}
+.room .plant{fill:#3E7A4E}
+.room .rname{font-size:11px;font-weight:600;fill:#C6D0D8;transition:fill .4s}
+.room .rwatt{font-size:11px;fill:#93A1AC;transition:fill .4s}
+.room.on .rname{fill:#3B3123}
+.room.on .rwatt{fill:#6B5C45}
+.room .ring{fill:none;stroke:var(--lamp);stroke-width:3;opacity:0}
+.room:focus-visible .ring{opacity:1}
+.hub{fill:#F2F1EC}
+.hubled{fill:none;stroke:#9AA6AF;stroke-width:1.5}
+body.hue .hubled{stroke:#7FD68F}
+body.pairing #bridge{cursor:pointer}
+body.pairing .hubled{stroke:#8FC7FF;animation:blink .5s steps(2) infinite}
+body.pairing .hubpulse{animation:pulse 1.2s ease-out infinite}
+.hubpulse{fill:none;stroke:#8FC7FF;stroke-width:2;opacity:0;transform-box:fill-box;transform-origin:center}
+@keyframes pulse{0%{opacity:.9;transform:scale(1)}100%{opacity:0;transform:scale(2.2)}}
+@keyframes blink{50%{stroke:#F2F1EC;background:transparent}}
+.hublabel{font-size:10px;fill:#C6D0D8;transition:fill .4s}
+.room.on .hublabel{fill:#3B3123}
+.dw{fill:#C9D2D8;opacity:.3}
+.screen{fill:#141B20}
+.lcd{font-size:7.5px;font-weight:600;text-anchor:middle;fill:#FFC46B}
+.meterbox{fill:#E4DFD3}
+.mled{fill:#5E6B74}
+body.oct .mled{fill:#7FD68F}
+#mtext{fill:#8CE0A0}
+.slabel{font-size:10px;fill:#AEB9C2}
+
+.below{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.6fr);gap:24px;margin-top:14px;font-size:14px}
+.hint{margin:0;color:var(--muted)}
+.log{margin:0;padding:0;list-style:none}
+.log li{padding:5px 0;border-top:1px solid var(--rule);color:var(--muted);animation:in .4s ease-out}
+.log li:nth-child(n+4){opacity:.55}
+.log li.app{color:var(--ink)}
+.log b{color:var(--forest);font-weight:600}
+@keyframes in{from{background:#DDEBDD}}
+.sync{margin:6px 0 0;color:var(--muted);font-size:13px}
+@media (max-width:640px){.below{grid-template-columns:1fr}header{flex-direction:column;align-items:flex-start}.banner{white-space:normal;width:calc(100% - 32px)}}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <div>
+      <h1>Simulated home</h1>
+      <p>Stands in for a real Philips Hue Bridge and Octopus smart meter.</p>
+    </div>
+    <dl class="devices">
+      <div><dt>Hue Bridge</dt><dd id="st-hue">Not linked</dd></div>
+      <div><dt>Smart meter</dt><dd id="st-oct">Not shared</dd></div>
+    </dl>
+  </header>
+
+  <figure>
+    <div class="banner" id="banner" hidden>GreenHome wants to link to this bridge.<button id="press">Press the bridge button</button></div>
+    <svg viewBox="0 0 640 440" role="group" aria-label="Cutaway of a two-storey home at 18:00. Click a room to switch its lights.">
+      <defs>
+        <linearGradient id="sky" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stop-color="#1A2533"/><stop offset=".55" stop-color="#2B394A"/><stop offset=".85" stop-color="#4C5463"/><stop offset="1" stop-color="#6D6468"/>
+        </linearGradient>
+        <radialGradient id="glow">
+          <stop offset="0" stop-color="#FFE6A8" stop-opacity=".9"/><stop offset=".5" stop-color="#FFD27A" stop-opacity=".35"/><stop offset="1" stop-color="#FFD27A" stop-opacity="0"/>
+        </radialGradient>
+        <clipPath id="roomclip"><rect width="177" height="104"/></clipPath>
+      </defs>
+      <rect width="640" height="390" fill="url(#sky)"/>
+      <g fill="#DDE5EE" opacity=".55"><circle cx="40" cy="40" r="1"/><circle cx="96" cy="22" r="1.2"/><circle cx="180" cy="50" r=".9"/><circle cx="250" cy="24" r="1"/><circle cx="520" cy="54" r="1"/><circle cx="566" cy="28" r="1.2"/><circle cx="612" cy="72" r=".9"/></g>
+      <rect y="388" width="640" height="52" fill="#162019"/>
+      <path d="M0 388.5H640" stroke="#22322A"/>
+      <g fill="#18241D"><rect x="72" y="330" width="6" height="60" fill="#141E19"/><circle cx="75" cy="316" r="30"/><circle cx="56" cy="336" r="20"/><circle cx="95" cy="334" r="21"/><circle cx="598" cy="380" r="17"/><circle cx="620" cy="385" r="13"/></g>
+      <rect x="428" y="94" width="22" height="40" fill="#26303A"/>
+      <rect x="134" y="160" width="372" height="230" fill="#D8D2C4"/>
+      <polygon points="118,164 320,70 522,164" fill="#26303A" stroke="#3A4754" stroke-width="1.5" stroke-linejoin="round"/>
+      <g id="rooms"></g>
+      <g id="meter">
+        <rect class="meterbox" x="514" y="312" width="30" height="46" rx="3"/>
+        <rect class="screen" x="518" y="318" width="22" height="11" rx="1.5"/>
+        <text class="lcd" id="mtext" x="529" y="326.5"></text>
+        <circle class="mled" cx="522" cy="350" r="2.5"/>
+      </g>
+      <text class="slabel" x="512" y="372">Smart meter</text>
+      <text class="slabel" x="512" y="384">kW now</text>
+    </svg>
+  </figure>
+
+  <div class="below">
+    <div>
+      <p class="hint">Click a room to switch its lights.</p>
+      <p class="sync" id="sync"></p>
+    </div>
+    <ol class="log" id="log" aria-live="polite"></ol>
+  </div>
+</div>
+
+<script src="config.js"></script>
+<script src="link.js"></script>
+<script>
+const $ = s => document.querySelector(s);
+const WATTS_PER_BULB = 9, BASELOAD_W = 350;
+
+const rooms = [
+  {name: 'Bedroom', x: 140, y: 166, bulbs: 2, v: 60, furn: `
+    <rect class="win" x="120" y="24" width="36" height="34"/><path class="mull" d="M138 24v34M120 41h36"/>
+    <g class="furn"><rect x="10" y="52" width="6" height="52" rx="1"/><rect x="10" y="90" width="108" height="14" rx="2"/><rect x="16" y="78" width="100" height="14" rx="4"/><rect x="22" y="71" width="26" height="9" rx="4"/><rect x="126" y="80" width="24" height="24" rx="2"/></g>`},
+  {name: 'Office', x: 323, y: 166, bulbs: 1, v: 0, furn: `
+    <g class="furn"><rect x="18" y="70" width="88" height="4" rx="1"/><rect x="22" y="74" width="3" height="30"/><rect x="99" y="74" width="3" height="30"/><rect x="42" y="47" width="38" height="22" rx="2"/><rect x="58" y="69" width="6" height="2"/><rect x="112" y="80" width="22" height="4" rx="1"/><rect x="130" y="60" width="4" height="24" rx="1"/><rect x="121" y="84" width="3" height="20"/><rect x="128" y="44" width="44" height="3"/></g>
+    <g id="bridge"><rect class="hubpulse" x="138" y="30" width="26" height="14" rx="4"/><rect class="hub" x="138" y="30" width="26" height="14" rx="4"/><circle class="hubled" cx="151" cy="37" r="3"/></g>
+    <text class="hublabel" x="172" y="22" text-anchor="end">Hue Bridge</text>`},
+  {name: 'Living room', x: 140, y: 278, bulbs: 3, v: 80, cx: 100, furn: `
+    <rect class="win" x="124" y="22" width="38" height="36"/><path class="mull" d="M143 22v36M124 40h38"/>
+    <g class="furn"><rect x="22" y="76" width="12" height="26" rx="4"/><rect x="118" y="76" width="12" height="26" rx="4"/><rect x="28" y="64" width="96" height="22" rx="6"/><rect x="26" y="84" width="102" height="16" rx="3"/><rect x="146" y="88" width="14" height="16" rx="2"/></g>
+    <g class="plant"><circle cx="153" cy="80" r="8"/><circle cx="147" cy="73" r="6"/><circle cx="159" cy="72" r="6"/></g>`},
+  {name: 'Kitchen', x: 323, y: 278, bulbs: 2, v: 100, furn: `
+    <g class="furn"><rect x="120" y="12" width="50" height="28" rx="2"/><rect x="6" y="62" width="165" height="5" rx="1"/><rect x="8" y="67" width="161" height="37"/><path d="M34 62V48h10v4" stroke="#0C141A" stroke-width="2.5" style="fill:none"/></g>
+    <rect class="dw" x="92" y="69" width="38" height="35" rx="2"/><rect class="screen" x="98" y="74" width="26" height="11" rx="2"/><text class="lcd" id="dwtime" x="111" y="82.5"></text>`},
+];
+const H = {linked: {hue: false, oct: false}, pairing: false, dishwasher: '18:00'};
+const watts = r => Math.round(r.bulbs * WATTS_PER_BULB * r.v / 100);
+let send = () => {};
+
+$('#rooms').innerHTML = rooms.map((r, i) => {
+  const cx = r.cx || 88.5, bar = (r.bulbs - 1) * 14 + 10;
+  const bulbs = Array.from({length: r.bulbs}, (_, k) => `<circle class="bulb" cx="${cx + (k - (r.bulbs - 1) / 2) * 14}" cy="28" r="5"/>`).join('');
+  return `<g class="room" data-i="${i}" role="button" tabindex="0" transform="translate(${r.x} ${r.y})">
+    <g clip-path="url(#roomclip)">
+      <rect class="base" width="177" height="104"/><rect class="lit" width="177" height="104"/>
+      ${r.furn}
+      <circle class="glow" cx="${cx}" cy="30" r="95" fill="url(#glow)"/>
+      <line class="fix" x1="${cx}" y1="0" x2="${cx}" y2="19" stroke-width="1.2"/><rect class="fix" x="${cx - bar / 2}" y="19" width="${bar}" height="3" rx="1.5"/>${bulbs}
+      <text class="rname" x="10" y="18">${r.name}</text><text class="rwatt" x="10" y="32"></text>
+    </g>
+    <rect class="ring" x="1.5" y="1.5" width="174" height="101"/>
+  </g>`;
+}).join('');
+document.querySelectorAll('.room').forEach((el, i) => Object.assign(rooms[i], {el, lit: el.querySelector('.lit'), glow: el.querySelector('.glow'), watt: el.querySelector('.rwatt')}));
+
+const state = () => ({type: 'state', linked: H.linked, pairing: H.pairing, dishwasher: H.dishwasher,
+  rooms: rooms.map(({name, bulbs, v}) => ({name, bulbs, v}))});
+
+function render() {
+  for (const r of rooms) {
+    const on = r.v > 0;
+    r.el.classList.toggle('on', on);
+    r.lit.style.opacity = on ? .55 + .4 * r.v / 100 : 0;
+    r.glow.style.opacity = on ? r.v / 100 : 0;
+    r.watt.textContent = on ? `${watts(r)} W, ${r.v}%` : 'Off';
+    r.el.setAttribute('aria-label', `${r.name} lights, ${on ? r.v + '%' : 'off'}`);
+  }
+  document.body.classList.toggle('hue', H.linked.hue);
+  document.body.classList.toggle('oct', H.linked.oct);
+  document.body.classList.toggle('pairing', H.pairing);
+  $('#banner').hidden = !H.pairing;
+  $('#dwtime').textContent = H.dishwasher;
+  $('#mtext').textContent = ((BASELOAD_W + rooms.reduce((s, r) => s + watts(r), 0)) / 1000).toFixed(2);
+  $('#st-hue').textContent = H.linked.hue ? 'Linked to GreenHome' : H.pairing ? 'Waiting for button' : 'Not linked';
+  $('#st-hue').className = H.linked.hue ? 'ok' : H.pairing ? 'wait' : '';
+  $('#st-oct').textContent = H.linked.oct ? 'Shared with GreenHome' : 'Not shared';
+  $('#st-oct').className = H.linked.oct ? 'ok' : '';
+}
+function update() { render(); send(state()); }
+
+function log(text, fromApp) {
+  const li = document.createElement('li');
+  li.className = fromApp ? 'app' : '';
+  li.innerHTML = fromApp ? `<b>GreenHome</b> ${text}` : text;
+  $('#log').prepend(li);
+  while ($('#log').children.length > 5) $('#log').lastChild.remove();
+}
+
+function pressBridge() {
+  if (!H.pairing) return;
+  H.pairing = false; H.linked.hue = true;
+  log('Hue Bridge button pressed. Bridge linked to GreenHome.');
+  update();
+}
+function toggleRoom(r) {
+  r.v = r.v === 0 ? 40 : r.v < 70 ? 70 : r.v < 100 ? 100 : 0;
+  log(`${r.name} lights ${r.v ? `set to ${r.v}%` : 'switched off'}.`);
+  update();
+}
+
+function onMessage(m) {
+  if (m.type === 'hello') send(state());
+  if (m.type === 'pair' && !H.linked.hue && !H.pairing) {
+    H.pairing = true;
+    log('wants to link. Press the button on the Hue Bridge.', true);
+    update();
+  }
+  if (m.type === 'link-octopus' && !H.linked.oct) {
+    setTimeout(() => {
+      H.linked.oct = true;
+      log('can now read this meter through Octopus.', true);
+      update();
+    }, 1200);
+  }
+  if (m.type === 'set-light' && H.linked.hue) {
+    const r = rooms[m.room];
+    r.v = m.v;
+    log(`turned ${m.v ? 'on' : 'off'} the ${r.name.toLowerCase()} lights.`, true);
+    update();
+  }
+  if (m.type === 'dishwasher') {
+    H.dishwasher = m.start;
+    log(`set the smart dishwasher to start at ${m.start}.`, true);
+    update();
+  }
+}
+
+$('#rooms').onclick = e => {
+  if (e.target.closest('#bridge')) return pressBridge();
+  const g = e.target.closest('.room');
+  if (g) toggleRoom(rooms[g.dataset.i]);
+};
+$('#rooms').onkeydown = e => {
+  const g = e.target.closest('.room');
+  if (g && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); toggleRoom(rooms[g.dataset.i]); }
+};
+$('#press').onclick = pressBridge;
+
+send = connectDemo(onMessage, mode => {
+  $('#sync').textContent = mode === 'supabase' ? 'Syncing over Supabase Realtime.' : 'Syncing with GreenHome in this browser.';
+  send(state());
+});
+render();
+</script>
+</body>
+</html>
