@@ -1,11 +1,18 @@
+import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
+import Register from './pages/Register';
 
-function App() {
+export default function App() {
   return (
-    <div>
-      <Home />
-    </div>
+    <Routes>
+      {/* Landing page route */}
+      <Route path="/" element={<Home />} />
+      
+      {/* Registration page route */}
+      <Route path="/register" element={<Register />} />
+      
+      {/* Login placeholder route (until you create Login.jsx) */}
+      <Route path="/login" element={<Register />} />
+    </Routes>
   );
 }
-
-export default App;
