@@ -1,0 +1,20 @@
+{
+  "class_names": [
+    "battery",
+    "cardboard",
+    "food_waste",
+    "general_waste",
+    "glass",
+    "metal",
+    "paper",
+    "plastic",
+    "textiles"
+  ],
+  "input_size": [
+    224,
+    224
+  ],
+  "input_layout": "NHWC",
+  "pixel_values": "raw 0-255 floats, no extra normalisation",
+  "confidence_threshold": 0.9
+}

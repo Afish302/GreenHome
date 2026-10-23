@@ -1,0 +1,113 @@
+actual=battery        predicted=textiles       Data/prepared/test/battery/kaggle_battery502.jpg
+actual=battery        predicted=metal          Data/prepared/test/battery/kaggle_battery797.jpg
+actual=battery        predicted=textiles       Data/prepared/test/battery/kaggle_battery821.jpg
+actual=battery        predicted=metal          Data/prepared/test/battery/kaggle_battery885.jpg
+actual=cardboard      predicted=plastic        Data/prepared/test/cardboard/kaggle_cardboard220.jpg
+actual=cardboard      predicted=metal          Data/prepared/test/cardboard/realwaste_Cardboard_134.jpg
+actual=cardboard      predicted=plastic        Data/prepared/test/cardboard/realwaste_Cardboard_136.jpg
+actual=cardboard      predicted=plastic        Data/prepared/test/cardboard/realwaste_Cardboard_156.jpg
+actual=cardboard      predicted=plastic        Data/prepared/test/cardboard/realwaste_Cardboard_187.jpg
+actual=cardboard      predicted=paper          Data/prepared/test/cardboard/realwaste_Cardboard_189.jpg
+actual=cardboard      predicted=paper          Data/prepared/test/cardboard/realwaste_Cardboard_216.jpg
+actual=cardboard      predicted=paper          Data/prepared/test/cardboard/realwaste_Cardboard_222.jpg
+actual=cardboard      predicted=glass          Data/prepared/test/cardboard/realwaste_Cardboard_277.jpg
+actual=cardboard      predicted=paper          Data/prepared/test/cardboard/realwaste_Cardboard_323.jpg
+actual=food_waste     predicted=textiles       Data/prepared/test/food_waste/kaggle_biological547.jpg
+actual=food_waste     predicted=textiles       Data/prepared/test/food_waste/kaggle_biological629.jpg
+actual=food_waste     predicted=textiles       Data/prepared/test/food_waste/kaggle_biological74.jpg
+actual=food_waste     predicted=glass          Data/prepared/test/food_waste/realwaste_Food Organics_105.jpg
+actual=food_waste     predicted=general_waste  Data/prepared/test/food_waste/realwaste_Food Organics_231.jpg
+actual=food_waste     predicted=general_waste  Data/prepared/test/food_waste/realwaste_Food Organics_235.jpg
+actual=food_waste     predicted=cardboard      Data/prepared/test/food_waste/realwaste_Food Organics_53.jpg
+actual=general_waste  predicted=textiles       Data/prepared/test/general_waste/kaggle_trash265.jpg
+actual=general_waste  predicted=food_waste     Data/prepared/test/general_waste/kaggle_trash460.jpg
+actual=general_waste  predicted=plastic        Data/prepared/test/general_waste/realwaste_Miscellaneous Trash_125.jpg
+actual=general_waste  predicted=food_waste     Data/prepared/test/general_waste/realwaste_Miscellaneous Trash_129.jpg
+actual=general_waste  predicted=glass          Data/prepared/test/general_waste/realwaste_Miscellaneous Trash_197.jpg
+actual=general_waste  predicted=cardboard      Data/prepared/test/general_waste/realwaste_Miscellaneous Trash_214.jpg
+actual=general_waste  predicted=plastic        Data/prepared/test/general_waste/realwaste_Miscellaneous Trash_253.jpg
+actual=general_waste  predicted=paper          Data/prepared/test/general_waste/realwaste_Miscellaneous Trash_284.jpg
+actual=general_waste  predicted=cardboard      Data/prepared/test/general_waste/realwaste_Miscellaneous Trash_288.jpg
+actual=general_waste  predicted=metal          Data/prepared/test/general_waste/realwaste_Miscellaneous Trash_98.jpg
+actual=glass          predicted=cardboard      Data/prepared/test/glass/kaggle_brown-glass378.jpg
+actual=glass          predicted=food_waste     Data/prepared/test/glass/kaggle_green-glass42.jpg
+actual=glass          predicted=food_waste     Data/prepared/test/glass/kaggle_green-glass98.jpg
+actual=glass          predicted=plastic        Data/prepared/test/glass/kaggle_white-glass210.jpg
+actual=glass          predicted=plastic        Data/prepared/test/glass/kaggle_white-glass229.jpg
+actual=glass          predicted=metal          Data/prepared/test/glass/kaggle_white-glass369.jpg
+actual=glass          predicted=textiles       Data/prepared/test/glass/kaggle_white-glass48.jpg
+actual=glass          predicted=plastic        Data/prepared/test/glass/kaggle_white-glass617.jpg
+actual=glass          predicted=plastic        Data/prepared/test/glass/kaggle_white-glass683.jpg
+actual=glass          predicted=plastic        Data/prepared/test/glass/kaggle_white-glass770.jpg
+actual=glass          predicted=plastic        Data/prepared/test/glass/realwaste_Glass_12.jpg
+actual=glass          predicted=cardboard      Data/prepared/test/glass/realwaste_Glass_121.jpg
+actual=glass          predicted=plastic        Data/prepared/test/glass/realwaste_Glass_318.jpg
+actual=glass          predicted=plastic        Data/prepared/test/glass/realwaste_Glass_389.jpg
+actual=glass          predicted=plastic        Data/prepared/test/glass/realwaste_Glass_395.jpg
+actual=glass          predicted=plastic        Data/prepared/test/glass/realwaste_Glass_41.jpg
+actual=metal          predicted=glass          Data/prepared/test/metal/kaggle_metal252.jpg
+actual=metal          predicted=battery        Data/prepared/test/metal/kaggle_metal357.jpg
+actual=metal          predicted=plastic        Data/prepared/test/metal/kaggle_metal446.jpg
+actual=metal          predicted=battery        Data/prepared/test/metal/kaggle_metal672.jpg
+actual=metal          predicted=cardboard      Data/prepared/test/metal/realwaste_Metal_145.jpg
+actual=metal          predicted=paper          Data/prepared/test/metal/realwaste_Metal_200.jpg
+actual=metal          predicted=cardboard      Data/prepared/test/metal/realwaste_Metal_265.jpg
+actual=metal          predicted=cardboard      Data/prepared/test/metal/realwaste_Metal_446.jpg
+actual=metal          predicted=general_waste  Data/prepared/test/metal/realwaste_Metal_549.jpg
+actual=metal          predicted=glass          Data/prepared/test/metal/realwaste_Metal_666.jpg
+actual=paper          predicted=cardboard      Data/prepared/test/paper/kaggle_paper486.jpg
+actual=paper          predicted=cardboard      Data/prepared/test/paper/kaggle_paper591.jpg
+actual=paper          predicted=cardboard      Data/prepared/test/paper/kaggle_paper631.jpg
+actual=paper          predicted=cardboard      Data/prepared/test/paper/kaggle_paper670.jpg
+actual=paper          predicted=glass          Data/prepared/test/paper/kaggle_paper987.jpg
+actual=paper          predicted=cardboard      Data/prepared/test/paper/realwaste_Paper_153.jpg
+actual=paper          predicted=cardboard      Data/prepared/test/paper/realwaste_Paper_154.jpg
+actual=paper          predicted=cardboard      Data/prepared/test/paper/realwaste_Paper_169.jpg
+actual=paper          predicted=cardboard      Data/prepared/test/paper/realwaste_Paper_172.jpg
+actual=paper          predicted=cardboard      Data/prepared/test/paper/realwaste_Paper_189.jpg
+actual=paper          predicted=cardboard      Data/prepared/test/paper/realwaste_Paper_285.jpg
+actual=paper          predicted=general_waste  Data/prepared/test/paper/realwaste_Paper_312.jpg
+actual=paper          predicted=cardboard      Data/prepared/test/paper/realwaste_Paper_403.jpg
+actual=paper          predicted=cardboard      Data/prepared/test/paper/realwaste_Paper_404.jpg
+actual=paper          predicted=cardboard      Data/prepared/test/paper/realwaste_Paper_422.jpg
+actual=plastic        predicted=general_waste  Data/prepared/test/plastic/kaggle_plastic124.jpg
+actual=plastic        predicted=cardboard      Data/prepared/test/plastic/kaggle_plastic166.jpg
+actual=plastic        predicted=glass          Data/prepared/test/plastic/kaggle_plastic208.jpg
+actual=plastic        predicted=glass          Data/prepared/test/plastic/kaggle_plastic316.jpg
+actual=plastic        predicted=paper          Data/prepared/test/plastic/kaggle_plastic332.jpg
+actual=plastic        predicted=glass          Data/prepared/test/plastic/kaggle_plastic334.jpg
+actual=plastic        predicted=glass          Data/prepared/test/plastic/kaggle_plastic344.jpg
+actual=plastic        predicted=glass          Data/prepared/test/plastic/kaggle_plastic361.jpg
+actual=plastic        predicted=paper          Data/prepared/test/plastic/kaggle_plastic370.jpg
+actual=plastic        predicted=paper          Data/prepared/test/plastic/kaggle_plastic546.jpg
+actual=plastic        predicted=glass          Data/prepared/test/plastic/kaggle_plastic60.jpg
+actual=plastic        predicted=glass          Data/prepared/test/plastic/kaggle_plastic605.jpg
+actual=plastic        predicted=glass          Data/prepared/test/plastic/kaggle_plastic680.jpg
+actual=plastic        predicted=glass          Data/prepared/test/plastic/kaggle_plastic750.jpg
+actual=plastic        predicted=glass          Data/prepared/test/plastic/kaggle_plastic834.jpg
+actual=plastic        predicted=general_waste  Data/prepared/test/plastic/realwaste_Plastic_109.jpg
+actual=plastic        predicted=paper          Data/prepared/test/plastic/realwaste_Plastic_122.jpg
+actual=plastic        predicted=glass          Data/prepared/test/plastic/realwaste_Plastic_14.jpg
+actual=plastic        predicted=general_waste  Data/prepared/test/plastic/realwaste_Plastic_151.jpg
+actual=plastic        predicted=metal          Data/prepared/test/plastic/realwaste_Plastic_199.jpg
+actual=plastic        predicted=cardboard      Data/prepared/test/plastic/realwaste_Plastic_203.jpg
+actual=plastic        predicted=metal          Data/prepared/test/plastic/realwaste_Plastic_212.jpg
+actual=plastic        predicted=metal          Data/prepared/test/plastic/realwaste_Plastic_246.jpg
+actual=plastic        predicted=metal          Data/prepared/test/plastic/realwaste_Plastic_248.jpg
+actual=plastic        predicted=general_waste  Data/prepared/test/plastic/realwaste_Plastic_261.jpg
+actual=plastic        predicted=metal          Data/prepared/test/plastic/realwaste_Plastic_322.jpg
+actual=plastic        predicted=general_waste  Data/prepared/test/plastic/realwaste_Plastic_326.jpg
+actual=plastic        predicted=metal          Data/prepared/test/plastic/realwaste_Plastic_34.jpg
+actual=plastic        predicted=glass          Data/prepared/test/plastic/realwaste_Plastic_355.jpg
+actual=plastic        predicted=glass          Data/prepared/test/plastic/realwaste_Plastic_359.jpg
+actual=plastic        predicted=metal          Data/prepared/test/plastic/realwaste_Plastic_360.jpg
+actual=plastic        predicted=glass          Data/prepared/test/plastic/realwaste_Plastic_500.jpg
+actual=plastic        predicted=cardboard      Data/prepared/test/plastic/realwaste_Plastic_523.jpg
+actual=plastic        predicted=glass          Data/prepared/test/plastic/realwaste_Plastic_693.jpg
+actual=plastic        predicted=metal          Data/prepared/test/plastic/realwaste_Plastic_71.jpg
+actual=plastic        predicted=metal          Data/prepared/test/plastic/realwaste_Plastic_73.jpg
+actual=plastic        predicted=cardboard      Data/prepared/test/plastic/realwaste_Plastic_760.jpg
+actual=plastic        predicted=metal          Data/prepared/test/plastic/realwaste_Plastic_88.jpg
+actual=plastic        predicted=metal          Data/prepared/test/plastic/realwaste_Plastic_99.jpg
+actual=textiles       predicted=plastic        Data/prepared/test/textiles/kaggle_clothes2840.jpg
+actual=textiles       predicted=general_waste  Data/prepared/test/textiles/kaggle_shoes90.jpg
