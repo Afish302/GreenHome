@@ -1,15 +1,12 @@
+import Header from '../components/header'
+import Footer from '../components/footer'
+import { Leaf } from 'lucide-react';
+
 export default function RecyclingScanner() {
   return (
     <div className="flex min-h-full w-full flex-col bg-surface font-sans">
       {/* Header */}
-      <header className="flex h-12 items-center gap-1 pl-3 pr-5">
-        <button className="flex h-11 w-9 items-center justify-center" aria-label="Back">
-          <span className="size-4 border-[1.7px] border-ink" /> {/* icon placeholder */}
-        </button>
-        <h1 className="flex-1 text-[19px] font-semibold text-ink">Recycling scanner</h1>
-        <span className="size-[17px] border-[1.8px] border-primary" /> {/* icon placeholder */}
-      </header>
-
+      <Header/>
       {/* Body */}
       <main className="flex min-h-[616px] flex-col gap-5 p-5">
         <div className="flex flex-col gap-1.5">
@@ -43,8 +40,8 @@ export default function RecyclingScanner() {
             <span className="text-xs text-muted">or</span>
             <span className="h-px flex-1 bg-line" />
           </div>
-          <button className="flex h-12 items-center justify-center gap-[9px] rounded-full bg-white text-sm font-semibold text-primary outline outline-1 -outline-offset-1 outline-line">
-            <span className="h-[15.5px] w-5 border-[1.6px] border-primary" /> {/* icon */}
+          <button className="flex h-12 items-center justify-center gap-[9px] rounded-full text-white bg-[var(--color-forest)] hover:bg-[var(--color-forest-dark)] text-sm font-semibold text-primary outline outline-1 -outline-offset-1 outline-line">
+            <span className="h-[15.5px] w-5 border-[1.6px] border-primary" /> <Leaf/>
             Take a Photo
           </button>
         </div>
@@ -66,16 +63,7 @@ export default function RecyclingScanner() {
       </main>
 
       {/* Footer action */}
-      <footer className="flex flex-col gap-2.5 border-t border-line bg-white px-5 pt-3.5 pb-[34px]">
-        <p className="text-center text-xs leading-[18px] text-muted">Add a photo to enable scanning.</p>
-        <button
-          disabled
-          className="flex h-12 items-center justify-center gap-2 rounded-full bg-disabled text-[15px] font-semibold text-muted disabled:cursor-not-allowed"
-        >
-          <span className="size-[13.5px] outline outline-[1.7px] outline-muted" /> {/* icon */}
-          Scan Item
-        </button>
-      </footer>
+      <Footer/>
     </div>
   );
 }

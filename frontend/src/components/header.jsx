@@ -5,7 +5,7 @@ import { Leaf } from 'lucide-react';
 export default function Home() {
     return (
             
-            <header className="w-full max-w-md md:max-w-4xl lg:max-w-6xl flex items-center justify-between py-3 mb-6 lg:mb-12">
+      <header className="w-full max-w-md md:max-w-4xl lg:max-w-6xl flex items-center justify-between py-3 mb-6 lg:mb-12">
         <Link 
           to="/" 
           className="flex items-center gap-2 font-bold text-lg md:text-xl text-[var(--color-forest)] focus:outline-hidden focus:ring-2 focus:ring-[var(--color-forest)] rounded-lg p-1 transition-all"
