@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { RefreshCw, Users, Gauge, ArrowRight} from 'lucide-react';
+import { RefreshCw, Users, Gauge, ArrowRight, Leaf} from 'lucide-react';
 import Header from '../components/header'
 import Footer from '../components/footer'
 
@@ -34,22 +34,7 @@ export default function Home() {
   return (
     <div className="min-h-screen bg-[var(--color-cream)] text-[var(--color-charcoal)] flex flex-col items-center justify-between p-4 sm:p-6 md:p-10 lg:p-12 font-sans antialiased selection:bg-[var(--color-mint-light)] selection:text-[var(--color-forest)]">
       
-      <header className="w-full max-w-md md:max-w-4xl lg:max-w-6xl flex items-center justify-between py-3 mb-6 lg:mb-12">
-        <Link 
-          to="/" 
-          className="flex items-center gap-2 font-bold text-lg md:text-xl text-[var(--color-forest)] focus:outline-hidden focus:ring-2 focus:ring-[var(--color-forest)] rounded-lg p-1 transition-all"
-          aria-label="Green Home Homepage"
-        >
-          <Leaf className="w-6 h-6 md:w-7 md:h-7 fill-current stroke-none" aria-hidden="true" />
-          <span>Green Home</span>
-        </Link>
-        <Link 
-          to="/login" 
-          className="text-sm md:text-base font-semibold text-[var(--color-forest)] hover:underline focus:outline-hidden focus:ring-2 focus:ring-[var(--color-forest)] rounded-md px-3 py-1.5"
-        >
-          Log In
-        </Link>
-      </header>
+    <Header/>
 
       <main className="w-full max-w-md md:max-w-4xl lg:max-w-6xl flex-1 flex flex-col items-stretch text-left">
         
@@ -204,12 +189,7 @@ export default function Home() {
           </p>
         </section>
       </main>
-
-      <footer className="w-full max-w-md md:max-w-4xl lg:max-w-6xl py-4 border-t border-slate-200/60 text-center">
-        <p className="text-slate-400 text-[10px] sm:text-xs tracking-widest uppercase font-semibold">
-          &copy; {new Date().getFullYear()} Green Home | Sustainable Household Intelligence
-        </p>
-      </footer>
+      <Footer/>
     </div> 
   );
 }
