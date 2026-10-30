@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { RefreshCw, Users, Gauge, ArrowRight, Leaf} from 'lucide-react';
+import { RefreshCw, Users, Gauge, ArrowRight} from 'lucide-react';
 import Header from '../components/header'
 import Footer from '../components/footer'
 
