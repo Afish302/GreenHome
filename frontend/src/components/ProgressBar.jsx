@@ -9,7 +9,7 @@ export default function ProgressBar({ current = 0, total = 1, labelText = 'TEXT 
   // set to the width of whatever its inside
   return (
     <div className="w-full flex flex-col gap-2">
-      <span className="text-xs font-semibold text-[var(--color-forest)]">
+      <span className="text-xs font-semibold text-left text-[var(--color-forest)]">
 
         {/* set labelText to change the text above the bar */}
         {labelText}
