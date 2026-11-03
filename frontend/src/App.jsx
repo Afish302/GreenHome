@@ -2,6 +2,7 @@ import { Routes, Route } from 'react-router-dom';
 import Home from './pages/Home';
 import Register from './pages/Register';
 import Scanner from './pages/Scanner';
+import Login from './pages/Login';
 
 export default function App() {
   return (
@@ -13,7 +14,7 @@ export default function App() {
       <Route path="/register" element={<Register />} />
       
       {/* Login placeholder route (until you create Login.jsx) */}
-      <Route path="/login" element={<Register />} />
+      <Route path="/login" element={<Login/>} />
       
       {/* Login placeholder route (until you create Login.jsx) */}
       <Route path="/scanner" element={<Scanner />} />

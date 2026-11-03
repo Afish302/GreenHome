@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import PrimaryButton from '../elements/PrimaryButton';
+import PrimaryButton from '../components/button';
 
 export default function Login({ onLogin, onNavigateToRegister }) {
   const [formData, setFormData] = useState({
