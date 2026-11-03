@@ -37,7 +37,6 @@ export default function Home() {
     <Header/>
 
       <main className="w-full max-w-md md:max-w-4xl lg:max-w-6xl flex-1 flex flex-col items-stretch text-left">
-        
         <section className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center mb-10 lg:mb-16">
           <div>
             <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight mb-4 leading-tight text-[var(--color-charcoal)]">
