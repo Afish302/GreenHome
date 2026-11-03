@@ -1,40 +1,56 @@
 import { useState } from 'react';
+import { Navigate, useLocation, useNavigate} from 'react-router-dom';
 import PrimaryButton from '../components/button';
+import {useAuth} from '../context/useAuth';
 
-export default function Login({ onLogin, onNavigateToRegister }) {
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    rememberMe: false,
-  });
+// redirect path after login
+const AFTER_LOGIN_PATH = '/';
 
+function loginError(message){
+  if(message === 'Invalid login credentials') return 'Wrong email or password. Please try again';
+  return message
+}
+
+export default function Login() {
+  
+  //Pass user input to use Auth function
+  const {user,loading,signIn} = useAuth()
+  const navigate = useNavigate();
+  const location = useLocation();
+  const redirectTo = location.state?.from?.pathname || AFTER_LOGIN_PATH;
+
+    // form state (these were deleted by accident)
+  const [formData, setFormData] = useState({ email: '', password: '', rememberMe: false });
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === 'checkbox' ? checked : value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: type === 'checkbox' ? checked : value }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-
-    // Basic Validation
     if (!formData.email || !formData.password) {
       setError('Please fill in all required fields.');
       return;
     }
-
-    // Call your login handler (pass form data or trigger navigation)
-    if (onLogin) {
-      onLogin(formData);
+    setSubmitting(true);
+    const { error: signInError } = await signIn(formData.email, formData.password);
+    setSubmitting(false);
+    if (signInError) {
+      setError(loginError(signInError.message));
+      return;
     }
+    navigate(redirectTo, { replace: true });
   };
 
+  // already logged in? skip the form
+  if (!loading && user) {
+    return <Navigate to={redirectTo} replace />;
+  }
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-8 px-4 sm:px-6 lg:px-8 font-sans">
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -127,7 +143,7 @@ export default function Login({ onLogin, onNavigateToRegister }) {
             {/* Submit Button */}
             <div className="pt-2">
               <PrimaryButton type="submit">
-                Log In
+                {submitting ? 'Logging in..':'Log In'}
               </PrimaryButton>
             </div>
           </form>
@@ -144,7 +160,7 @@ export default function Login({ onLogin, onNavigateToRegister }) {
             Don’t have a GreenHome account yet?{' '}
             <button
               type="button"
-              onClick={onNavigateToRegister}
+              onClick={navigate('/register')}
               className="font-bold text-[#1E6B35] hover:underline cursor-pointer"
             >
               Create Free Account
