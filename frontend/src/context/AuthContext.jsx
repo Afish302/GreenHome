@@ -1,18 +1,22 @@
 import { createContext, useContext, useEffect, useState } from 'react';
+// import supabase to estrablish connection
 import { supabase } from '../lib/supabaseClient';
 
+// Create empty variable to store authentication context
 const AuthContext = createContext(null);
 
+// export the function to be used as a component on other pages /components
 export function AuthProvider({ children }) {
   const [session, setSession] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  // set loading to false if session data is not found (user is logged out)
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => {
       setSession(data.session);
       setLoading(false);
     });
-
+    // define session data 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, newSession) => {
       setSession(newSession);
     });
