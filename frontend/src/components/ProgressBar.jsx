@@ -1,6 +1,6 @@
 // pass in steps done and total steps. The bar fills to match.
-// example: <ProgressBar current={1} total={3} labelText="Step 1 of 3" />
-export default function ProgressBar({ current = 0, total = 1, labelText = 'TEXT HERE! TEXT HERE! TEXT HERE!' }) {
+// example: <ProgressBar current={1} total={3} labelText="Step 1 of 3" className="optional extra styling" />
+export default function ProgressBar({ current = 0, total = 1, labelText = 'TEXT HERE! TEXT HERE! TEXT HERE!', className = '' }) {
   
     // turns steps into a % for the bar fill
   const percent = (current / total) * 100;
@@ -8,7 +8,7 @@ export default function ProgressBar({ current = 0, total = 1, labelText = 'TEXT 
 
   // set to the width of whatever its inside
   return (
-    <div className="w-full flex flex-col gap-2">
+    <div className={"w-full flex flex-col gap-2 " + className}>
       <span className="text-xs font-semibold text-left text-[var(--color-forest)]">
 
         {/* set labelText to change the text above the bar */}

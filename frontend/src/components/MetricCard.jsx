@@ -1,10 +1,10 @@
 // pass in a label and value. The card displays them as a headline metric.
-// example: <MetricCard icon={<Cloud />} label="Carbon Saved" value="100" type="kg" subtext="up 5% since last month" />
-export default function MetricCard({ icon, label = 'Label here!', value = '0', type = 'Value Type here!', subtext = 'Subtext here!' }) {
+// example: <MetricCard icon={<Cloud />} label="Carbon Saved" value="100" type="kg" subtext="up 5% since last month" className="optional extra styling" />
+export default function MetricCard({ icon, label = 'Label here!', value = '0', type = 'Value Type here!', subtext = 'Subtext here!', className = '' }) {
 
   // card box
   return (
-    <div className="bg-white rounded-3xl p-5 shadow-sm">
+    <div className={"bg-white rounded-3xl p-5 shadow-sm " + className}>
 
       {/* icon and label */}
        <div className="flex items-center justify-start gap-2 text-[var(--color-charcoal-muted)] text-sm">

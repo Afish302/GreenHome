@@ -3,6 +3,10 @@ import Home from './pages/Home';
 import Register from './pages/Register';
 import Scanner from './pages/Scanner';
 
+import OnboardCommute from './pages/onboardCommute';
+//import OnboardFood from './pages/onboardFood';
+//import OnboardHouse from './pages/onboardHouse';
+
 export default function App() {
   return (
     <Routes>
@@ -17,6 +21,11 @@ export default function App() {
       
       {/* Login placeholder route (until you create Login.jsx) */}
       <Route path="/scanner" element={<Scanner />} />
+
+      {/* Onboarding routes */}
+      <Route path="/onboardCommute" element={<OnboardCommute />} />
+      {/* <Route path="/onboardFood" element={<OnboardFood />} /> */}
+      {/* <Route path="/onboardHouse" element={<OnboardHouse />} /> */}
     </Routes>
   );
 }
