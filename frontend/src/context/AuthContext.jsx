@@ -1,9 +1,7 @@
-import { createContext, useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 // import supabase to estrablish connection
 import { supabase } from '../lib/supabaseClient';
-
-// Create empty variable to store authentication context
-const AuthContext = createContext(null);
+import {AuthContext} from './useAuth'
 
 // export the function to be used as a component on other pages /components
 export function AuthProvider({ children }) {
@@ -42,8 +40,4 @@ export function AuthProvider({ children }) {
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
-}
-
-export function useAuth() {
-  return useContext(AuthContext);
 }
