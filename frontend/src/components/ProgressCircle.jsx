@@ -2,10 +2,10 @@ import { CircularProgressbar, buildStyles } from 'react-circular-progressbar';
 import 'react-circular-progressbar/dist/styles.css';
 
 // pass in steps done and total steps. The circle fills to match.
-// example: <ProgressCircle current={50} total={100} />
-export default function ProgressCircle({ current = 0, total = 1 }) {
+// example: <ProgressCircle current={50} total={100} className="optional extra styling" />
+export default function ProgressCircle({ current = 0, total = 1, className = '' }) {
   return (
-    <div className="relative w-40">
+    <div className={"relative w-40 " + className}>
       <CircularProgressbar
         value={current}
         maxValue={total}

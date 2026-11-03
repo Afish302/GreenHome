@@ -1,16 +1,16 @@
 import Slider from 'rc-slider';
 import 'rc-slider/assets/index.css';
 
-// example: <RangeSlider label="Label" value={0} min={0} max={100} type="Type" onClick={setValue} />
-export default function RangeSlider({ label = 'TEXT HERE!', value = 0, min = 0, max = 100, type = 'Value Type here!', onClick }) {
+// example: <RangeSlider label="Label" value={distance} min={0} max={100} type="Type" onClick={setValue} className="optional extra styling" />
+export default function RangeSlider({ label = 'TEXT HERE!', value = 0, min = 0, max = 100, type = 'Value Type here!', onClick, className = '' }) {
   return (
 
-    <div className="flex flex-col gap-2 p-4 bg-white border border-slate-100 rounded-2xl">
+    <div className={"flex flex-col gap-2 p-4 bg-white border border-slate-100 rounded-2xl " + className}>
 
       {/* label and current value */}
-      <div className="flex text-sm">
-        <span className="mr-auto text-[var(--color-charcoal)]">{label}</span>
-        <span className="ml-auto font-bold text-[var(--color-forest)]">{value} {type}</span>
+      <div className="flex gap-2 text-sm">
+        <span className="text-[var(--color-charcoal)]">{label}</span>
+        <span className="font-bold text-[var(--color-forest)]">{value} {type}</span>
       </div>
 
       {/* slider */}
