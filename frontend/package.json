@@ -10,9 +10,9 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@supabase/supabase-js": "^2.109.0",
+    "@supabase/supabase-js": "^2.118.0",
     "lucide": "^1.59.0",
-    "lucide-react": "^1.59.0",
+    "lucide-react": "^1.66.0",
     "onnxruntime-web": "^1.31.1",
     "rc-slider": "^11.1.9",
     "react": "^19.3.1",
