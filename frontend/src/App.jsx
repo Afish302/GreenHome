@@ -16,6 +16,9 @@ import Scanner from './pages/Scanner';
 
 // Global Layout Wrapper
 import AppLayout from './components/AppLayout';
+import OnboardCommute from './pages/onboardCommute';
+//import OnboardFood from './pages/onboardFood';
+//import OnboardHouse from './pages/onboardHouse';
 
 export default function App() {
   return (
