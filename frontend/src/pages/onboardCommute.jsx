@@ -8,10 +8,7 @@ import Button from '../components/button'
 import IconButton from '../components/IconButton'
 
 export default function CommuteAnswers() {
-  const [transit, updateTransit] = useState(false)
-  const [electric, updateElectric] = useState(false)
-  const [gasoline, updateGasoline] = useState(false)
-  const [bike, updateBike] = useState(false)
+  const [commute, updateCommute] = useState(null)
   const [distance, updateDistance] = useState(0)
   const [diet, updateDiet] = useState(null)
   const [number, updateNumber] = useState(0)
@@ -20,14 +17,15 @@ export default function CommuteAnswers() {
 
   return (
     <div>
+    <div className="w-full max-w-[1000px] mx-auto">
     <div className="min-h-screen bg-[var(--color-cream)] text-[var(--color-charcoal)] flex flex-col items-center justify-between p-4 sm:p-6 md:p-10 lg:p-12 font-sans antialiased">
       
       {/* Top of page */}
-      <main className="w-full max-w-md md:max-w-4xl lg:max-w-6xl flex-1 flex flex-col items-stretch text-left gap-6">
+      <main className="w-full flex-1 flex flex-col items-stretch text-left gap-6 max-w-[1000px]">
         <div className="flex items-center gap-2">
           <IconButton label="Back" navigate="/"><ArrowLeft className="w-6 h-6" /></IconButton>
           <h1 className="text-2xl font-bold mr-auto">Lifestyle Baseline</h1>
-          <Button variant="text">Skip for now</Button>
+          <Button variant="text" navigate="/onboardFood">Skip for now</Button>
         </div>
         
         <ProgressBar current={1} total={3} labelText="Step 1 of 3: Daily Habits" />
@@ -40,10 +38,10 @@ export default function CommuteAnswers() {
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <OptionCard icon={<BusFront size={20} />} label="Public Transit" selected={transit} onClick={function () { updateTransit(!transit) }} />
-            <OptionCard icon={<CarFront size={20} />} label="Electric Vehicle" selected={electric} onClick={function () { updateElectric(!electric) }} />
-            <OptionCard icon={<Fuel size={20} />} label="Gasoline Car" selected={gasoline} onClick={function () { updateGasoline(!gasoline) }} />
-            <OptionCard icon={<Bike size={20} />} label="Bicycle/Walking" selected={bike} onClick={function () { updateBike(!bike) }} />
+            <OptionCard icon={<BusFront size={20} />} label="Public Transport" selected={commute == "public"} onClick={function () { updateCommute("public") }} />
+            <OptionCard icon={<CarFront size={20} />} label="Electric Vehicle" selected={commute == "electric"} onClick={function () { updateCommute("electric") }} />
+            <OptionCard icon={<Fuel size={20} />} label="Petrol Car" selected={commute == "petrol"} onClick={function () { updateCommute("petrol") }} />
+            <OptionCard icon={<Bike size={20} />} label="Bicycle/Walking" selected={commute == "bike"} onClick={function () { updateCommute("bike") }} />
           </div>
 
           <div>
@@ -97,15 +95,18 @@ export default function CommuteAnswers() {
         </section>
       </main>
     </div>
+    </div>
 
     {/* Bottom of page */}
     <section className="w-full">
       <div className="w-full min-h-[14vh] bg-white shadow-md flex flex-col gap-3 px-8 py-4">
+        <div className="w-full max-w-[904px] mx-auto flex flex-col gap-3">
         <div className="flex items-center justify-center gap-2 py-2 rounded-full bg-[#EAF4E9] text-sm text-[var(--color-charcoal)]">
           <Leaf className="text-[var(--color-forest)]" size={20} />
           <span>Estimated Footprint: <span className="font-semibold text-[var(--color-forest)]">{estimatedFootprint} t CO₂e/yr</span></span>
         </div>
-        <Button className="!w-full !rounded-full">Save & Calculate Footprint</Button>
+        <Button navigate="/onboardFood" className="!w-full !rounded-full">Save & Calculate Footprint</Button>
+        </div>
       </div>
     </section>
     </div>

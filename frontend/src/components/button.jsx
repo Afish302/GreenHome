@@ -7,7 +7,7 @@ import { Link } from 'react-router-dom';
 export default function Button({ navigate, onClick, type = 'button', variant = 'primary', children, className = '' }) {
 
   // shared style
-  const preset = "w-full sm:w-auto px-8 py-4 text-center font-bold text-base rounded-2xl shadow-md transition-all active:scale-[0.98] cursor-pointer";
+  const preset = "w-full sm:w-auto px-8 py-4 text-center font-bold text-base rounded-2xl shadow-md transition-all cursor-pointer";
 
   // the variants
   const variants = {

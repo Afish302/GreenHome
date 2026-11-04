@@ -5,8 +5,8 @@ import Scanner from './pages/Scanner';
 import Login from './pages/Login';
 
 import OnboardCommute from './pages/onboardCommute';
-//import OnboardFood from './pages/onboardFood';
-//import OnboardHouse from './pages/onboardHouse';
+import OnboardFood from './pages/onboardFood';
+import OnboardHouse from './pages/onboardHouse';
 
 export default function App() {
   return (
@@ -25,8 +25,8 @@ export default function App() {
 
       {/* Onboarding routes */}
       <Route path="/onboardCommute" element={<OnboardCommute />} />
-      {/* <Route path="/onboardFood" element={<OnboardFood />} /> */}
-      {/* <Route path="/onboardHouse" element={<OnboardHouse />} /> */}
+      <Route path="/onboardFood" element={<OnboardFood />} />
+      <Route path="/onboardHouse" element={<OnboardHouse />} />
     </Routes>
   );
 }
