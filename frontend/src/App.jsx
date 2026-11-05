@@ -17,8 +17,8 @@ import Scanner from './pages/Scanner';
 // Global Layout Wrapper
 import AppLayout from './components/AppLayout';
 import OnboardCommute from './pages/onboardCommute';
-//import OnboardFood from './pages/onboardFood';
-//import OnboardHouse from './pages/onboardHouse';
+import OnboardFood from './pages/onboardFood';
+import OnboardHouse from './pages/onboardHouse';
 
 export default function App() {
   return (
@@ -37,6 +37,10 @@ export default function App() {
         <Route path="/onboarding-3" element={<Onboarding3 />} /> */}
       </Route>
 
+      {/* Onboarding routes */}
+      <Route path="/onboardCommute" element={<OnboardCommute />} />
+      <Route path="/onboardFood" element={<OnboardFood />} />
+      <Route path="/onboardHouse" element={<OnboardHouse />} />
       {/* =========================================================
           2. FULL APPLICATION ROUTES (showNavbar={true})
           Both top header bar and bottom mobile navigation are displayed.

@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 // action example: <IconButton label="Close" onClick={handleClick} className="added styling"><X /></IconButton>
 export default function IconButton({ label = 'TEXT HERE!', navigate, onClick, children, className = '' }) {
 
-  const style = "w-10 h-10 flex items-center justify-center rounded-full text-[var(--color-charcoal)] transition-all active:scale-[0.95] cursor-pointer " + className;
+  const style = "w-10 h-10 flex items-center justify-center rounded-full text-[var(--color-charcoal)] transition-all cursor-pointer " + className;
 
   // nav icon button, used when a page address is given.
   if (navigate) {
