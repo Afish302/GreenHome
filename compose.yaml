@@ -6,12 +6,8 @@ services:
       context: backend
       target: development
     command: npm run start-watch
-    environment:
-      - DATABASE_DB=example
-      - DATABASE_USER=root
-      - DATABASE_PASSWORD=/run/secrets/db-password
-      - DATABASE_HOST=db
-      - NODE_ENV=development
+    env_file:
+      - backend/.env
     ports:
       - 8080:80
       - 9229:9229
