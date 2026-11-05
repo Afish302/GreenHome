@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, TrendingUp, TrendingDown } from 'lucide-react';
+import { Camera, TrendingUp, TrendingDown, Leaf, Zap } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
 
-// Reusable Components from src/components/
+// Components
 import ProgressCircle from '../components/ProgressCircle';
 import MetricCard from '../components/MetricCard';
 import Badge from '../components/badge';
@@ -12,15 +12,15 @@ import Button from '../components/button';
 export default function Dashboard() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-
-  // Dynamic user profile state fetched from Supabase
   const [userProfile, setUserProfile] = useState({
     userName: '',
     score: 0,
-    prevScore: 0, // Baseline used to calculate +/- points delta
+    prevScore: 0,
+    carbonSaved: 0,
+    energyRating: 'B',
+    energySubject: 'Calculating rating...',
   });
 
-  // Mock community data matching Figma UI
   const communities = [
     {
       id: 1,
@@ -48,42 +48,64 @@ export default function Dashboard() {
     },
   ];
 
-  // Fetch real User metrics from Supabase on component mount
-useEffect(() => {
-  async function fetchUserData() {
-    try {
-      setLoading(true);
+  useEffect(() => {
+    async function fetchUserData() {
+      try {
+        setLoading(true);
 
-      // Fetch all rows first to verify connection and avoid .single() error crashes
-      const { data, error } = await supabase
+      // 1. Fetch user Record from Supabase
+      const { data: userData, error: UserError } = await supabase
         .from('Users')
-        .select('id, UserName, Score');
+        .select('*')  
+        .limit(1);
 
-      if (error) {
-        console.error('Supabase Query Error:', error.message);
-        throw error;
+        if (UserError) throw UserError;
+
+        if (userData && userData.length > 0) {
+          const user = userData[0];
+          const currentScore = user.Score ?? 0;
+      // 2. Dynamic Carbon Calculation
+      const calculatedCarbon = Math.round(currentScore * 0.1);
+
+      // 3. Fetch electricityUsage table for Energy Efficiency calculation
+      let rating = 'A+';
+      let ratingSub = 'Top 10% of green homes';
+
+      const { data: usageData } = await supabase
+        .from ('electricityUsage')
+        .select('*')
+        .limit(1);
+      
+      if (usageData && usageData.length > 0) {
+        const usage = usageData[0].amount || usageData[0].kwh || 0;
+        if (usage > 500) {
+          rating = 'B';
+          ratingSub = 'Average home usage';
+        } else if (usage > 300) {
+          rating = 'A';
+          ratingSub = 'Top 25% of green homes';
+        }
       }
 
-      // If data exists, pick the first user record
-      if (data && data.length > 0) {
-        const firstUser = data[0];
-        setUserProfile({
-          userName: firstUser.UserName || 'User',
-          score: firstUser.Score ?? 0,
-          prevScore: (firstUser.Score ?? 0) - 8,
-        });
+          setUserProfile({
+            userName: user.UserName || 'User',
+            score: currentScore,
+            prevScore: currentScore - 8,
+            carbonSaved: calculatedCarbon || 120,
+            energyRating: rating,
+            energySubject: ratingSub,
+          });
+        } 
+      } catch (err) {
+        console.error('💥 Fetch execution failed:', err);
+      } finally {
+        setLoading(false);
       }
-    } catch (err) {
-      console.error('Fetch failed:', err);
-    } finally {
-      setLoading(false);
     }
-  }
 
-  fetchUserData();
-}, []);
+    fetchUserData();
+  }, []);
 
-  // Compute calculated values dynamically
   const scoreDiff = userProfile.score - userProfile.prevScore;
   const isPositiveDiff = scoreDiff >= 0;
 
@@ -103,10 +125,7 @@ useEffect(() => {
 
   return (
     <div className="space-y-6">
-      
-      {/* =========================================================
-          SECTION 1: USER GREETING & PROFILE
-         ========================================================= */}
+      {/* 1. Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-extrabold text-gray-900 tracking-tight">
@@ -117,7 +136,6 @@ useEffect(() => {
           </p>
         </div>
 
-        {/* User Profile Avatar */}
         <div className="relative">
           <img
             src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
@@ -128,9 +146,7 @@ useEffect(() => {
         </div>
       </div>
 
-      {/* =========================================================
-          SECTION 2: YOUR IMPACT (Score & Metric Cards)
-         ========================================================= */}
+      {/* 2. Impact Section */}
       <section className="space-y-3">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-gray-900">Your impact</h2>
@@ -141,12 +157,11 @@ useEffect(() => {
           </select>
         </div>
 
-        {/* Dynamic Eco Score Highlight Card */}
+        {/* Eco Score Section */}
         <div className="bg-[#E8F5E9]/60 p-5 rounded-3xl border border-emerald-100 flex items-center gap-5">
-          {/* Dynamic Progress Circle Component */}
           <div className="shrink-0">
             <ProgressCircle
-              value={userProfile.score}
+              value={userProfile.score > 100 ? userProfile.score % 100 : userProfile.score}
               max={100}
               size={90}
               strokeWidth={8}
@@ -174,27 +189,25 @@ useEffect(() => {
           </div>
         </div>
 
-        {/* Secondary Metrics Grid */}
+        {/* Secondary Metrics Section */}
         <div className="grid grid-cols-2 gap-3">
           <MetricCard
-            title="Carbon Saved"
-            value="120"
-            unit="kg"
-            trend="↑ 18% vs. last month"
-            icon="leaf"
+            label="Carbon Saved"
+            value={String(userProfile.carbonSaved)}
+            type=""
+            subtext={userProfile.energySubtext}
           />
           <MetricCard
-            title="Energy Efficiency"
-            value="A+"
-            badgeText="Top 10% of green homes"
-            icon="zap"
+            icon={<Zap className="w-4 h-4 text-emerald-600" />}
+            label="Energy Efficiency"
+            value={userProfile.energyRating}
+            type=""
+            subtext={userProfile.energySubject}
           />
         </div>
       </section>
 
-      {/* =========================================================
-          SECTION 3: BETTER TOGETHER (Community Group List)
-         ========================================================= */}
+{/* 3. Community Section */}
       <section className="space-y-3">
         <div className="flex items-center justify-between">
           <div>
@@ -210,7 +223,6 @@ useEffect(() => {
           </button>
         </div>
 
-        {/* Community List */}
         <div className="space-y-2.5">
           {communities.map((item) => (
             <div
@@ -221,9 +233,9 @@ useEffect(() => {
                 <img
                   src={item.image}
                   alt={item.name}
-                  className="w-12 h-12 rounded-xl object-cover shrink-0"
+                  className="w-11 h-11 rounded-xl object-cover shrink-0"
                 />
-                <div className="space-y-1">
+                <div className="space-y-1 min">
                   <h4 className="text-xs font-bold text-gray-900 leading-none">
                     {item.name}
                   </h4>
@@ -236,7 +248,6 @@ useEffect(() => {
                 </div>
               </div>
 
-              {/* Action Button */}
               <Button
                 variant={item.joined ? 'outline' : 'primary'}
                 size="sm"
@@ -249,9 +260,7 @@ useEffect(() => {
         </div>
       </section>
 
-      {/* =========================================================
-          SECTION 4: RECYCLING SCANNER CALLOUT
-         ========================================================= */}
+      {/* Scanner Section */}
       <section className="space-y-2">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-gray-900">Recycling scanner</h2>
@@ -279,7 +288,6 @@ useEffect(() => {
           </button>
         </div>
       </section>
-
     </div>
   );
 }
