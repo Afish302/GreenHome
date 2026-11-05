@@ -160,7 +160,7 @@ export default function Login() {
             Don’t have a GreenHome account yet?{' '}
             <button
               type="button"
-              onClick={navigate('/register')}
+              onClick={() => navigate('/register')}
               className="font-bold text-[#1E6B35] hover:underline cursor-pointer"
             >
               Create Free Account
