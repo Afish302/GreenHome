@@ -14,6 +14,8 @@
     "test-wait-debuger": "cross-env NODE_ENV=test PORT=8081 mocha --no-timeouts --exit --inspect-brk=0.0.0.0:9230"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.118.0",
+    "dotenv": "^18.0.9",
     "express": "^4.17.1",
     "knex": "^0.95.11",
     "morgan": "^1.10.0",

@@ -1,6 +1,8 @@
-import { createClient } from '@supabase/supabase-js'
-// Get enviroment variables to connect to supabase
-const supabaseUrl = import.meta.env.VITE_SUP_PROJECT_URL
-const supabasePublishableKey = import.meta.env.VITE_SUP_PUBLISH_KEY
-// establish supabase connection
-export const supabase = createClient(supabaseUrl, supabasePublishableKey)
+import { createClient } from '@supabase/supabase-js';
+
+// Get environment variables to connect to Supabase (matching .env variable names)
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';
+const supabasePublishableKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder-key';
+
+// Establish Supabase connection
+export const supabase = createClient(supabaseUrl, supabasePublishableKey);
