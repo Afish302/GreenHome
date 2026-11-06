@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Leaf } from 'lucide-react';
-import AuthButtons from '../elements/LoginLogout';
+import AuthButtons from '../elements/LoginLogoutButton';
 
 
 export default function Home() {
