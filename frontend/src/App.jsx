@@ -43,10 +43,12 @@ export default function App() {
           Both top header bar and bottom mobile navigation are displayed.
           Used for main app features (Dashboard, Scanner, Community, Settings).
          ========================================================= */}
-      <Route element={<AppLayout showNavbar={true} />}>
-        <Route path="/dashboard" element={<Dashboard />} />
-        <Route path="/scanner" element={<Scanner />} />
-        <Route path="/settings" element={<Settings />} />
+      <Route element={<ProtectedRoute/>}>
+        <Route element={<AppLayout showNavbar={true} />}>
+          <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/scanner" element={<Scanner />} />
+          <Route path="/settings" element={<Settings />} />
+        </Route>
       </Route>
     </Routes>
   );
