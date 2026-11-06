@@ -6,6 +6,7 @@ import RangeSlider from '../components/RangeSlider'
 import NumberStepper from '../components/NumberStepper'
 import Button from '../components/button'
 import IconButton from '../components/IconButton'
+import SmartHomeDemo from '../components/SmartHomeDemo'
 
 export default function Settings() {
   const [units, updateUnits] = useState('metric')
@@ -100,6 +101,8 @@ export default function Settings() {
         </div>
       </section>
 
+
+      <SmartHomeDemo />
 
        {/* Privacy and Account */}
       <section>
