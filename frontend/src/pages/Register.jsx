@@ -1,10 +1,13 @@
 import { useState } from 'react';
+import { useAuth } from '../context/useAuth';
 import { Link, useNavigate } from 'react-router-dom';
 import { Leaf, ArrowLeft, Eye, EyeOff, Sprout } from 'lucide-react';
 
 export default function Register() {
+  
   const navigate = useNavigate();
-
+  const { signUp } = useAuth();
+  
   const [formData, setFormData] = useState({
     fullName: '',
     email: '',
@@ -14,6 +17,9 @@ export default function Register() {
 
   const [showPassword, setShowPassword] = useState(false);
 
+  const [error, setError] = useState('');
+  const [emailSent, setEmailSent] = useState(false);
+
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
     setFormData((prev) => ({
@@ -22,12 +28,21 @@ export default function Register() {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log('Registering user:', formData);
+    setError('');
+    const { error: signUpError } = await signUp(formData.email, formData.password, formData.fullName);
+    if (signUpError) {
+      setError(signUpError.message);
+      return;
+  }
+  setEmailSent(true); // Confirm email is ON: user must click the email link first
   };
-
+  if (emailSent) {
+      return <p className="p-8 text-center">Check your email ({formData.email}) and click the link to activate your account, then sign in.</p>;
+    }
   return (
+
     <div className="min-h-screen bg-[#F8F9FA] text-[#1A1A1A] flex flex-col items-center p-4 sm:p-6 md:p-8 font-sans antialiased selection:bg-[#E8F5E9] selection:text-[#2E7D32]">
       
       <div className="w-full max-w-sm sm:max-w-md flex flex-col justify-start">
@@ -69,6 +84,7 @@ export default function Register() {
           </section>
 
           {/* Form */}
+          {error && <p className="text-red-600 text-sm mb-4">{error}</p>}
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             
             {/* Full Name */}
