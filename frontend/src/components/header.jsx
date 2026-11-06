@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom';
 import { Leaf } from 'lucide-react';
+import AuthButtons from '../elements/LoginLogout';
 
 
 export default function Home() {
@@ -14,12 +15,7 @@ export default function Home() {
           <Leaf className="w-6 h-6 md:w-7 md:h-7 fill-current stroke-none" aria-hidden="true" />
           <span>Green Home</span>
         </Link>
-        <Link 
-          to="/login" 
-          className="text-sm md:text-base font-semibold text-[var(--color-forest)] hover:underline focus:outline-hidden focus:ring-2 focus:ring-[var(--color-forest)] rounded-md px-3 py-1.5"
-        >
-          Log In
-        </Link>
+        <AuthButtons/>
       </header>
     );
 }
