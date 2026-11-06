@@ -195,7 +195,7 @@ export default function Dashboard() {
             label="Carbon Saved"
             value={String(userProfile.carbonSaved)}
             type=""
-            subtext={userProfile.energySubtext}
+            subtext={userProfile.energySubject}
           />
           <MetricCard
             icon={<Zap className="w-4 h-4 text-emerald-600" />}
@@ -242,7 +242,7 @@ export default function Dashboard() {
                   <p className="text-[11px] text-gray-400 font-medium">
                     {item.members}
                   </p>
-                  <Badge variant="emerald" size="sm">
+                  <Badge variant="emerald" size="sm" label={'• ' + item.tag}>
                     • {item.tag}
                   </Badge>
                 </div>
@@ -273,8 +273,7 @@ export default function Dashboard() {
             <p className="text-xs text-gray-500">
               Open camera and get recycling guidance.
             </p>
-            <Badge variant="emerald" size="sm">
-              • Ready to scan
+            <Badge variant="emerald" size="sm" label='• Ready to scan'>
             </Badge>
           </div>
 
@@ -285,6 +284,32 @@ export default function Dashboard() {
           >
             <Camera className="w-5 h-5" />
             <span className="text-xs font-bold">Scan</span>
+          </button>
+        </div>
+      </section>
+
+      <section className="space-y-2">
+        <div className="flex items-center justify-between">
+          <h2 className="text-lg font-bold text-gray-900">Finish setting up</h2>
+          <span className="text-xs text-gray-400">3 quick steps</span>
+        </div>
+
+        <div className="bg-white p-4 rounded-2xl border border-gray-100 flex items-center justify-between gap-3 shadow-xs">
+          <div className="space-y-1">
+            <h3 className="text-sm font-bold text-gray-900">Complete your setup</h3>
+            <p className="text-xs text-gray-500">
+              Just a few steps to go.
+            </p>
+            <Badge variant="emerald" size="sm" label='Finish your setup'>
+            </Badge>
+          </div>
+
+          <button
+            type="button"
+            onClick={() => {navigate('/onboardCommute'); window.scrollTo(0, 0);}}
+            className="bg-[var(--color-forest,#15803d)] text-white px-4 py-3 rounded-2xl flex flex-col items-center justify-center gap-1 hover:opacity-90 transition-opacity shadow-sm shrink-0"
+          >
+            <span className="text-xs font-bold">Resume</span>
           </button>
         </div>
       </section>
