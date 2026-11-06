@@ -1,5 +1,6 @@
 import { Routes, Route } from 'react-router-dom';
-
+// Used to protect routed only meant for users
+import ProtectedRoute from './components/ProtectedRoute';
 // Public & Authentication Pages
 import Home from './pages/Home';
 import Register from './pages/Register';
