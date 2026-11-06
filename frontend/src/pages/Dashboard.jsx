@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Camera, TrendingUp, TrendingDown, Leaf, Zap } from 'lucide-react';
 import { supabase } from '../lib/supabaseClient';
+import { useAuth } from '../context/useAuth';
 
 // Components
 import ProgressCircle from '../components/ProgressCircle';
@@ -47,55 +48,59 @@ export default function Dashboard() {
       image: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=120&q=80',
     },
   ];
-
+  // The logged-in Supabase user (ProtectedRoute makes sure there is one)
+  const { user } = useAuth();
+  const userId = user?.id;
+  
   useEffect(() => {
+    if (!userId) return;
+
     async function fetchUserData() {
       try {
-        setLoading(true);
+        // 1. Fetch THIS user's row from the Users table
+        const { data: row, error: userError } = await supabase
+          .from('Users')
+          .select('UserName, Score')
+          .eq('user_id', userId)   // only the row linked to this login
+          .maybeSingle();          // one row or null, no array
 
-      // 1. Fetch user Record from Supabase
-      const { data: userData, error: UserError } = await supabase
-        .from('Users')
-        .select('*')  
-        .limit(1);
+        if (userError) throw userError;
 
-        if (UserError) throw UserError;
+        if (row) {
+          const currentScore = row.Score ?? 0;
+          // 2. Dynamic Carbon Calculation
+          const calculatedCarbon = Math.round(currentScore * 0.1);
 
-        if (userData && userData.length > 0) {
-          const user = userData[0];
-          const currentScore = user.Score ?? 0;
-      // 2. Dynamic Carbon Calculation
-      const calculatedCarbon = Math.round(currentScore * 0.1);
+          // 3. Fetch electricityUsage table for Energy Efficiency calculation
+          // (still the first row for now, not per user yet)
+          let rating = 'A+';
+          let ratingSub = 'Top 10% of green homes';
 
-      // 3. Fetch electricityUsage table for Energy Efficiency calculation
-      let rating = 'A+';
-      let ratingSub = 'Top 10% of green homes';
+          const { data: usageData } = await supabase
+            .from('electricityUsage')
+            .select('*')
+            .limit(1);
 
-      const { data: usageData } = await supabase
-        .from ('electricityUsage')
-        .select('*')
-        .limit(1);
-      
-      if (usageData && usageData.length > 0) {
-        const usage = usageData[0].amount || usageData[0].kwh || 0;
-        if (usage > 500) {
-          rating = 'B';
-          ratingSub = 'Average home usage';
-        } else if (usage > 300) {
-          rating = 'A';
-          ratingSub = 'Top 25% of green homes';
-        }
-      }
+          if (usageData && usageData.length > 0) {
+            const usage = usageData[0].amount || usageData[0].kwh || 0;
+            if (usage > 500) {
+              rating = 'B';
+              ratingSub = 'Average home usage';
+            } else if (usage > 300) {
+              rating = 'A';
+              ratingSub = 'Top 25% of green homes';
+            }
+          }
 
           setUserProfile({
-            userName: user.UserName || 'User',
+            userName: row.UserName || 'User',
             score: currentScore,
             prevScore: currentScore - 8,
             carbonSaved: calculatedCarbon || 120,
             energyRating: rating,
             energySubject: ratingSub,
           });
-        } 
+        }
       } catch (err) {
         console.error('💥 Fetch execution failed:', err);
       } finally {
@@ -104,7 +109,7 @@ export default function Dashboard() {
     }
 
     fetchUserData();
-  }, []);
+  }, [userId]);
 
   const scoreDiff = userProfile.score - userProfile.prevScore;
   const isPositiveDiff = scoreDiff >= 0;
