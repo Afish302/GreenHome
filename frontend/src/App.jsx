@@ -5,14 +5,10 @@ import Home from './pages/Home';
 import Register from './pages/Register';
 import Login from './pages/Login';
 
-// Onboarding Pages (commented out until files are created)
-// import Onboarding1 from './pages/Onboarding1';
-// import Onboarding2 from './pages/Onboarding2';
-// import Onboarding3 from './pages/Onboarding3';
-
 // Main Application Pages
 import Dashboard from './pages/Dashboard';
 import Scanner from './pages/Scanner';
+import Settings from './pages/Settings';
 
 // Global Layout Wrapper
 import AppLayout from './components/AppLayout';
@@ -49,6 +45,7 @@ export default function App() {
       <Route element={<AppLayout showNavbar={true} />}>
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/scanner" element={<Scanner />} />
+        <Route path="/settings" element={<Settings />} />
       </Route>
     </Routes>
   );

@@ -17,13 +17,13 @@ export default function OnboardHouse() {
 
   return (
     <div>
-    <div className="w-full max-w-[1000px] mx-auto">
+    <div className="w-full max-w-[750px] mx-auto">
     <div className="min-h-screen bg-[var(--color-cream)] text-[var(--color-charcoal)] flex flex-col items-center justify-between p-4 sm:p-6 md:p-10 lg:p-12 font-sans antialiased">
       
       {/* Top of page */}
       <main className="w-full flex-1 flex flex-col items-stretch text-left gap-6 max-w-[1000px]">
         <div className="flex items-center gap-2">
-          <IconButton label="Back" navigate="/onboardFood"><ArrowLeft className="w-6 h-6" /></IconButton>
+          <IconButton navigate="/onboardFood"><ArrowLeft className="w-6 h-6" /></IconButton>
           <h1 className="text-2xl font-bold mr-auto">Carbon Baseline</h1>
           <Button variant="text" navigate="/dashboard">Skip for now</Button>
         </div>
