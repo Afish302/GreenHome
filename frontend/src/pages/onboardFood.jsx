@@ -21,7 +21,7 @@ export default function OnboardFood() {
       {/* Top of page */}
       <main className="w-full flex-1 flex flex-col items-stretch text-left gap-6 max-w-[1000px]">
         <div className="flex items-center gap-2">
-          <IconButton label="Back" navigate="/onboardCommute"><ArrowLeft className="w-6 h-6" /></IconButton>
+          <IconButton navigate="/onboardCommute"><ArrowLeft className="w-6 h-6" /></IconButton>
           <h1 className="text-2xl font-bold mr-auto">Carbon Baseline</h1>
           <Button variant="text" navigate="/onboardHouse">Skip for now</Button>
         </div>
