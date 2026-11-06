@@ -11,11 +11,11 @@ export default function Settings() {
   const [units, updateUnits] = useState('metric')
 
   return (
-    <main className="w-full flex flex-col gap-6">
+    <main className="w-full flex flex-col gap-6 max-w-[750px] mx-auto">
         <Button variant="text" navigate="/dashboard" className="ml-auto">Skip for now</Button>
 
       {/* Lifestyle Baseline & Footprint */}
-      <section>
+      <section >
         <span className="font-bold">Lifestyle Baseline & Footprint</span>
 
          {/* Carbon Baseline Setup*/}

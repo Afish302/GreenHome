@@ -17,7 +17,7 @@ export default function CommuteAnswers() {
 
   return (
     <div>
-    <div className="w-full max-w-[1000px] mx-auto">
+    <div className="w-full max-w-[750px] mx-auto">
     <div className="min-h-screen bg-[var(--color-cream)] text-[var(--color-charcoal)] flex flex-col items-center justify-between p-4 sm:p-6 md:p-10 lg:p-12 font-sans antialiased">
       
       {/* Top of page */}
