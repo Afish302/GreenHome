@@ -23,7 +23,7 @@ export default function CommuteAnswers() {
       {/* Top of page */}
       <main className="w-full flex-1 flex flex-col items-stretch text-left gap-6 max-w-[1000px]">
         <div className="flex items-center gap-2">
-          <IconButton label="Back" navigate="/"><ArrowLeft className="w-6 h-6" /></IconButton>
+          <IconButton label="Back" navigate="/dashboard"><ArrowLeft className="w-6 h-6" /></IconButton>
           <h1 className="text-2xl font-bold mr-auto">Lifestyle Baseline</h1>
           <Button variant="text" navigate="/onboardFood">Skip for now</Button>
         </div>
@@ -105,7 +105,7 @@ export default function CommuteAnswers() {
           <Leaf className="text-[var(--color-forest)]" size={20} />
           <span>Estimated Footprint: <span className="font-semibold text-[var(--color-forest)]">{estimatedFootprint} t CO₂e/yr</span></span>
         </div>
-        <Button navigate="/onboardFood" className="!w-full !rounded-full">Save & Calculate Footprint</Button>
+        <Button navigate="/onboardFood" onClick={function () { window.scrollTo(0, 0) }} className="!w-full !rounded-full">Save & Calculate Footprint</Button>
         </div>
       </div>
     </section>

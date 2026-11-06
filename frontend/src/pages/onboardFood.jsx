@@ -73,7 +73,7 @@ export default function OnboardFood() {
           <Leaf className="text-[var(--color-forest)]" size={20} />
           <span>Estimated Footprint: <span className="font-semibold text-[var(--color-forest)]">{estimatedFootprint} t CO₂e/yr</span></span>
         </div>
-        <Button navigate="/onboardHouse" className="!w-full !rounded-full">Continue to Household (2/3)</Button>
+        <Button navigate="/onboardHouse" onClick={function () { window.scrollTo(0, 0) }} className="!w-full !rounded-full">Continue to Household (2/3)</Button>
         </div>
       </div>
     </section>

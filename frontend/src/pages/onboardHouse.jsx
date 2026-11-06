@@ -25,7 +25,7 @@ export default function OnboardHouse() {
         <div className="flex items-center gap-2">
           <IconButton label="Back" navigate="/onboardFood"><ArrowLeft className="w-6 h-6" /></IconButton>
           <h1 className="text-2xl font-bold mr-auto">Carbon Baseline</h1>
-          <Button variant="text" navigate="/">Skip for now</Button>
+          <Button variant="text" navigate="/dashboard">Skip for now</Button>
         </div>
         
         <ProgressBar current={3} total={3} labelText="Step 3 of 3: Household Energy" />
@@ -92,7 +92,7 @@ export default function OnboardHouse() {
           <Leaf className="text-[var(--color-forest)]" size={20} />
           <span>Estimated Footprint: <span className="font-semibold text-[var(--color-forest)]">{estimatedFootprint} t CO₂e/yr</span></span>
         </div>
-        <Button navigate="/" className="!w-full !rounded-full">Complete Setup & Go to Dashboard (3/3)</Button>
+        <Button navigate="/dashboard" onClick={function () { window.scrollTo(0, 0) }} className="!w-full !rounded-full">Complete Setup & Go to Dashboard (3/3)</Button>
         </div>
       </div>
     </section>
