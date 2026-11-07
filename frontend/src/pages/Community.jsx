@@ -33,6 +33,11 @@ export default function Community() {
         // gets the logged in user ID from the Users table
         supabase.from('Users').select('id').eq('email', user.email).single()
             .then(function (result) {
+                // stops if the user was not found, so it keeps showing loading
+                if (result.data == null) {
+                    return
+                }
+
                 const input_user_id = result.data.id
                 updateMyID(input_user_id)
 
@@ -87,7 +92,8 @@ export default function Community() {
                                 <span className="font-bold">Friends</span>
                                 <span className="text-sm font-normal text-[#657065]">Friends List</span>
                             </div>
-                            <Button variant="text" className="ml-auto">Manage friends</Button>
+                            <Button variant="secondary" className="ml-auto" navigate="/addFriends">Add Friends</Button>
+                            <Button variant="text" className="ml-3" navigate="/manageFriends">Manage friends</Button>
                         </div>
 
                         {loading == true && (
