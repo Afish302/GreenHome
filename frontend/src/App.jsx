@@ -10,6 +10,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Scanner from './pages/Scanner';
 import Settings from './pages/Settings';
+import Community from './pages/Community';
 
 // Global Layout Wrapper
 import AppLayout from './components/AppLayout';
@@ -48,6 +49,7 @@ export default function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/scanner" element={<Scanner />} />
           <Route path="/settings" element={<Settings />} />
+          <Route path="/community" element={<Community />} />
         </Route>
       </Route>
     </Routes>
