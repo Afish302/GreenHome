@@ -10,6 +10,7 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Scanner from './pages/Scanner';
 import Settings from './pages/Settings';
+import Activities from './pages/Activities';
 
 // Global Layout Wrapper
 import AppLayout from './components/AppLayout';
@@ -46,6 +47,7 @@ export default function App() {
       <Route element={<ProtectedRoute/>}>
         <Route element={<AppLayout showNavbar={true} />}>
           <Route path="/dashboard" element={<Dashboard />} />
+          <Route path="/activities" element={<Activities />} />
           <Route path="/scanner" element={<Scanner />} />
           <Route path="/settings" element={<Settings />} />
         </Route>
