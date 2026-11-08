@@ -1,6 +1,6 @@
 /*import { useState } from 'react';*/
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Leaf, LayoutDashboard, Camera, Users, Settings, ListTodo } from 'lucide-react';
+import { Leaf, LayoutDashboard, Users, Settings, ListTodo } from 'lucide-react';
 
 // Bottom navigation for mobile devices
 import BottomNav from './BottomNav';
