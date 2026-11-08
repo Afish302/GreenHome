@@ -11,7 +11,7 @@ export default function BottomNav() {
     <nav className="fixed bottom-0 left-0 right-0 bg-white border-t border-slate-100 flex justify-around py-3">
 
       {/* home */}
-      <NavLink to="/" end className={tabStyle}>
+      <NavLink to="/dashboard" end className={tabStyle}>
         <div className={iconStyle}><Home className="w-6 h-6" /></div>
         <span className={textStyle}>Home</span>
       </NavLink>
