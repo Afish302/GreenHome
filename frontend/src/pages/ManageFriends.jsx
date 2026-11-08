@@ -13,7 +13,7 @@ export default function ManageFriends() {
     const { user } = useAuth()
 
 
-    // loads the friends leaderboard for the logged in user
+    // loads the friends leaderboard for the  user
     useEffect(function () {
         // stops if nobody is logged in
         if (user == null) {
@@ -35,12 +35,15 @@ export default function ManageFriends() {
             })
     }, [user])
 
-    // gets the logged in user row from the leaderboard
+    // gets the users row from the list
     const myRow = friendsList.find(function (friend) {
-        return friend.user_id == myID
+        if (friend.user_id == myID) {
+            return true
+        }
+        return false
     })
 
-    // takes the logged in user out of the list
+    // takes the user out of the list
     const friendsOnly = friendsList.filter(function (friend) {
         if (friend.user_id == myID) {
             return false
@@ -48,7 +51,7 @@ export default function ManageFriends() {
         return true
     })
 
-    // removes a friend, then takes them off the list
+    // removes a friend and takes them off the list
     function removeFriend(friendID) {
         const input_user_id = myID
         const input_friend_id = friendID

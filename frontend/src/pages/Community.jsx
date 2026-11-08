@@ -23,7 +23,7 @@ export default function Community() {
     const { user } = useAuth()
 
 
-    // loads the friends leaderboard for the logged in user
+    // loads the friends leaderboard
     useEffect(function () {
         // stops if nobody is logged in
         if (user == null) {
@@ -33,7 +33,7 @@ export default function Community() {
         // gets the logged in user ID from the Users table
         supabase.from('Users').select('id').eq('email', user.email).single()
             .then(function (result) {
-                // stops if the user was not found, so it keeps showing loading
+                // stops if the user was not found
                 if (result.data == null) {
                     return
                 }
@@ -41,7 +41,7 @@ export default function Community() {
                 const input_user_id = result.data.id
                 updateMyID(input_user_id)
 
-                // gets the friends leaderboard, including the logged in user
+                // gets the friends leaderboard
                 supabase.rpc('get_friends_leaderboard_with_me', { input_user_id })
                     .then(function (result) {
                         updateFriendsList(result.data)
@@ -50,13 +50,13 @@ export default function Community() {
             })
     }, [user])
 
-    // shows the top 5 friends, or all of them when the list is extended
+    // shows the top 5 friends or all of them when the list is extended
     let friendLeaderboard = friendsList.slice(0, 5)
     if (extendList) {
         friendLeaderboard = friendsList
     }
 
-    // gets the logged in user row from the leaderboard
+    // gets the logged in users row from the leaderboard
     const myRow = friendsList.find(function (friend) {
         return friend.user_id == myID
     })

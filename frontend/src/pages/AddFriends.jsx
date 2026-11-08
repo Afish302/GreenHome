@@ -13,9 +13,9 @@ export default function ManageFriends() {
     const { user } = useAuth()
 
 
-    // loads the friend requests for the logged in user
+    // loads the friend requests for the user
     useEffect(function () {
-        // stops if nobody is logged in
+        // checks for login
         if (user == null) {
             return
         }
@@ -26,7 +26,7 @@ export default function ManageFriends() {
                 const input_user_id = result.data.id
                 updateMyID(input_user_id)
 
-                // gets the IDs of everyone who sent the logged in user a request
+                // gets the ID of everyone who sent the logged in user a request
                 supabase.rpc('get_friend_requests', { input_user_id })
                     .then(function (result) {
                         const requestIDs = []
@@ -48,8 +48,8 @@ export default function ManageFriends() {
     <div className="space-y-3">
         <div className="flex items-center">
             <div className="flex flex-col">
-                <span className="font-bold">Manage Friends</span>
-                <span className="text-sm font-normal text-[#657065]">Friends List</span>
+                <span className="font-bold">Add Friends</span>
+                <span className="text-sm font-normal text-[#657065]">Friend requests</span>
             </div>
             <Button variant="text" className="ml-auto" navigate="/community">Return</Button>
         </div>
@@ -58,9 +58,9 @@ export default function ManageFriends() {
             <p className="text-sm text-[#657065]">Loading…</p>
         )}
 
-        {/* Friends board */}
+        {/* Friend request board */}
         {loading == false && (
-            <div className="space-y-3">
+            <div>
                 <div className="flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden">
                     {requestsList.map(function (friend, i) {
                         return (
