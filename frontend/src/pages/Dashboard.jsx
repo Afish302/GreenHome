@@ -1,8 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Camera, TrendingUp, TrendingDown, Leaf, Zap } from 'lucide-react';
-import { supabase } from '../lib/supabaseClient';
-import { useAuth } from '../context/useAuth';
+import { Camera, TrendingUp, TrendingDown, Zap } from 'lucide-react';
+import { useDashboardData } from '../hooks/useDashboardData';
 
 // Components
 import ProgressCircle from '../components/ProgressCircle';
@@ -12,16 +11,10 @@ import Button from '../components/button';
 
 export default function Dashboard() {
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true);
-  const [userProfile, setUserProfile] = useState({
-    userName: '',
-    score: 0,
-    prevScore: 0,
-    carbonSaved: 0,
-    energyRating: 'B',
-    energySubject: 'Calculating rating...',
-  });
+  // get user data from dashboard
+  const { data: userProfile, loading, error } = useDashboardData();
 
+  // todo: fetch dynamically
   const communities = [
     {
       id: 1,
@@ -48,76 +41,10 @@ export default function Dashboard() {
       image: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=120&q=80',
     },
   ];
-  // The logged-in Supabase user (ProtectedRoute makes sure there is one)
-  const { user } = useAuth();
-  const userId = user?.id;
-  
-  useEffect(() => {
-    if (!userId) return;
-
-    async function fetchUserData() {
-      try {
-        // 1. Fetch THIS user's row from the Users table
-        const { data: row, error: userError } = await supabase
-          .from('Users')
-          .select('UserName, Score')
-          .eq('user_id', userId)   // only the row linked to this login
-          .maybeSingle();          // one row or null, no array
-
-        if (userError) throw userError;
-
-        if (row) {
-          const currentScore = row.Score ?? 0;
-          // 2. Dynamic Carbon Calculation
-          const calculatedCarbon = Math.round(currentScore * 0.1);
-
-          // 3. Fetch electricityUsage table for Energy Efficiency calculation
-          // (still the first row for now, not per user yet)
-          let rating = 'A+';
-          let ratingSub = 'Top 10% of green homes';
-
-          const { data: usageData } = await supabase
-            .from('electricityUsage')
-            .select('*')
-            .limit(1);
-
-          if (usageData && usageData.length > 0) {
-            const usage = usageData[0].amount || usageData[0].kwh || 0;
-            if (usage > 500) {
-              rating = 'B';
-              ratingSub = 'Average home usage';
-            } else if (usage > 300) {
-              rating = 'A';
-              ratingSub = 'Top 25% of green homes';
-            }
-          }
-
-          setUserProfile({
-            userName: row.UserName || 'User',
-            score: currentScore,
-            prevScore: currentScore - 8,
-            carbonSaved: calculatedCarbon || 120,
-            energyRating: rating,
-            energySubject: ratingSub,
-          });
-        }
-      } catch (err) {
-        console.error('💥 Fetch execution failed:', err);
-      } finally {
-        setLoading(false);
-      }
-    }
-
-    fetchUserData();
-  }, [userId]);
-
-  const scoreDiff = userProfile.score - userProfile.prevScore;
-  const isPositiveDiff = scoreDiff >= 0;
-
-  const getStatusText = (score) => {
-    if (score >= 80) return 'Growing greener.';
-    if (score >= 50) return 'Making progress.';
-    return 'Getting started.';
+  const getStatusText= (score) => {
+    if(score >= 200) return 'Growing greener.';
+    if(score >= 500)  return 'Making progress';
+    return 'Getting started!';
   };
 
   if (loading) {
@@ -127,6 +54,14 @@ export default function Dashboard() {
       </div>
     );
   }
+  // return error message if user das not found or could not be loaded in useDashboard.js
+  if(error || !userProfile){
+    return(
+      <p className="p-4 text-sm text-red-600">
+        Could not load your dashboard. Please refresh the page.
+      </p>
+    )
+  };
 
   return (
     <div className="space-y-6">
@@ -166,11 +101,9 @@ export default function Dashboard() {
         <div className="bg-[#E8F5E9]/60 p-5 rounded-3xl border border-emerald-100 flex items-center gap-5">
           <div className="shrink-0">
             <ProgressCircle
-              value={userProfile.score > 100 ? userProfile.score % 100 : userProfile.score}
-              max={100}
-              size={90}
-              strokeWidth={8}
-              color="#1E6B35"
+              current={Math.min(userProfile.score, 1000)}
+              total={1000}
+              className='w-24'
             />
           </div>
 
@@ -182,14 +115,8 @@ export default function Dashboard() {
               {getStatusText(userProfile.score)}
             </h3>
             <p className="text-xs text-emerald-700 font-semibold flex items-center gap-1">
-              {isPositiveDiff ? (
-                <TrendingUp className="w-3.5 h-3.5" />
-              ) : (
-                <TrendingDown className="w-3.5 h-3.5 text-amber-600" />
-              )}
-              <span>
-                {Math.abs(scoreDiff)} points {isPositiveDiff ? 'up from' : 'down from'} last month
-              </span>
+              <TrendingUp className="w-3.5 h-3.5" />
+              <span>{userProfile.score} points earned so far</span>
             </p>
           </div>
         </div>
@@ -199,15 +126,15 @@ export default function Dashboard() {
           <MetricCard
             label="Carbon Saved"
             value={String(userProfile.carbonSaved)}
-            type=""
-            subtext={userProfile.energySubject}
+            type="kg"
+            subtext={userProfile.energySubtext}
           />
           <MetricCard
             icon={<Zap className="w-4 h-4 text-emerald-600" />}
             label="Energy Efficiency"
             value={userProfile.energyRating}
             type=""
-            subtext={userProfile.energySubject}
+            subtext={userProfile.energySubtext}
           />
         </div>
       </section>
