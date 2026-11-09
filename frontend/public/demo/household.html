@@ -331,6 +331,12 @@ function onMessage(m) {
       update();
     }, 1200);
   }
+  // App found existing links in Supabase: re-link without pairing (this page forgets on reload)
+  if (m.type === 'restore' && ((m.hue && !H.linked.hue) || (m.oct && !H.linked.oct))) {
+    if (m.hue) { H.linked.hue = true; H.pairing = false; }
+    if (m.oct) H.linked.oct = true;
+    update();
+  }
   if (m.type === 'set-light' && H.linked.hue) {
     const r = rooms[m.room];
     r.v = m.v;

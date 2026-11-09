@@ -1,12 +1,41 @@
 // Smart home demo: link Philips Hue and Octopus Energy from Settings.
 // Usage graphs and suggestions live elsewhere in the app; this section only handles linking.
 // It talks to household.html (public/demo/) over BroadcastChannel, same origin only.
-// If VITE_SUP_PROJECT_URL is set, it also syncs over Supabase Realtime (cross-device).
+// If VITE_SUPABASE_URL is set, it also syncs over Supabase Realtime (cross-device).
+// Links are saved to smartDevice, and one estimated daily reading per session to electricityUsage.
 import { useEffect, useRef, useState } from 'react'
 import { supabase } from '../lib/supabaseClient'
+import { useAuth } from '../context/useAuth'
 
 const HOUSEHOLD_URL = '/demo/household.html'
 const roomW = r => Math.round(r.bulbs * 9 * r.v / 100)
+const TYPE = { hue: 'hue', oct: 'octopus' } // smartDevice.DeviceType values
+
+// Keeps Supabase in step with the simulated home's state messages.
+// db: { id: Users.id, saved: { hue, oct } } once loaded, else null.
+function syncToDb(m, db, send, wrote) {
+  if (!db || !m) return
+  const { id, saved } = db
+  // Simulated home was reloaded and forgot links we have stored: re-link it.
+  if ((saved.hue && !m.linked.hue) || (saved.oct && !m.linked.oct)) send({ type: 'restore', hue: saved.hue, oct: saved.oct })
+
+  const power = { hue: m.rooms.reduce((s, r) => s + roomW(r), 0), oct: Math.round((m.meterKw ?? 0) * 1000) }
+  for (const k of ['hue', 'oct']) {
+    if (!m.linked[k] || saved[k]) continue
+    saved[k] = true // set before the request so later messages don't insert again
+    supabase.from('smartDevice')
+      .upsert({ userID: id, DeviceType: TYPE[k], averagePower: power[k] }, { onConflict: 'userID,DeviceType', ignoreDuplicates: true })
+      .then(({ error }) => { if (error) console.error(`Saving ${TYPE[k]} link failed:`, error) })
+  }
+
+  if (m.meterKw != null && !wrote.current) {
+    wrote.current = true
+    // ponytail: current kW x 24 as the day's kWh, last write of the day wins. Sum real readings for accuracy.
+    supabase.from('electricityUsage')
+      .upsert({ userID: id, date: new Date().toLocaleDateString('en-CA'), ElectricityUsage: Math.round(m.meterKw * 24) }, { onConflict: 'userID,date' })
+      .then(({ error }) => { if (error) console.error('Saving meter reading failed:', error) })
+  }
+}
 
 // Same protocol as link.js, so household.html needs no changes.
 function connectDemo(onMessage, onStatus) {
@@ -23,7 +52,7 @@ function connectDemo(onMessage, onStatus) {
   queueMicrotask(() => report('local'))
 
   let ch = null, remote = null
-  if (import.meta.env.VITE_SUP_PROJECT_URL) {
+  if (import.meta.env.VITE_SUPABASE_URL) {
     ch = supabase.channel('greenhome-demo')
     ch.on('broadcast', { event: 'msg' }, m => receive(m.payload))
     ch.subscribe(status => {
@@ -47,8 +76,30 @@ export default function SmartHomeDemo() {
   const [mode, setMode] = useState('local')
   const [noHome, setNoHome] = useState(false)
   const [octPending, setOctPending] = useState(false)
-  const link = useRef(null), homeRef = useRef(null)
+  const [saved, setSaved] = useState({ hue: false, oct: false })
+  const link = useRef(null), homeRef = useRef(null), dbRef = useRef(null), wrote = useRef(false)
   const send = msg => link.current?.send(msg)
+  const { user } = useAuth()
+  const authId = user?.id
+
+  // Load this user's Users.id and saved links, then catch up on any state already received.
+  useEffect(() => {
+    if (!authId) return
+    let cancelled = false
+    ;(async () => {
+      const { data: row, error } = await supabase.from('Users').select('id').eq('user_id', authId).maybeSingle()
+      if (error || !row) return console.error('Smart home: no Users row for this login', error)
+      const { data: devices, error: devErr } = await supabase.from('smartDevice').select('DeviceType').eq('userID', row.id)
+      if (devErr) return console.error('Smart home: loading devices failed', devErr)
+      if (cancelled) return
+      const types = new Set(devices.map(d => d.DeviceType))
+      const s = { hue: types.has(TYPE.hue), oct: types.has(TYPE.oct) }
+      dbRef.current = { id: row.id, saved: { ...s } }
+      setSaved(s)
+      syncToDb(homeRef.current, dbRef.current, send, wrote)
+    })()
+    return () => { cancelled = true; dbRef.current = null }
+  }, [authId])
 
   useEffect(() => {
     const onMessage = m => {
@@ -56,6 +107,7 @@ export default function SmartHomeDemo() {
       if (m.linked.oct) setOctPending(false)
       homeRef.current = m
       setHome(m)
+      syncToDb(m, dbRef.current, send, wrote)
     }
     link.current = connectDemo(onMessage, md => { setMode(md); link.current?.send({ type: 'hello' }) })
     const hello = setInterval(() => { if (!homeRef.current) link.current.send({ type: 'hello' }) }, 1500)
@@ -64,8 +116,8 @@ export default function SmartHomeDemo() {
   }, [])
 
   const h = home || { linked: {}, rooms: [] }
-  const hue = h.linked.hue ? 'on' : h.pairing ? 'wait' : 'off'
-  const oct = h.linked.oct ? 'on' : octPending ? 'wait' : 'off'
+  const hue = h.linked.hue || saved.hue ? 'on' : h.pairing ? 'wait' : 'off'
+  const oct = h.linked.oct || saved.oct ? 'on' : octPending ? 'wait' : 'off'
   const w = h.rooms.reduce((s, r) => s + roomW(r), 0)
 
   return (
@@ -98,7 +150,7 @@ export default function SmartHomeDemo() {
             </div>
           )}
           {hue === 'wait' && <div className="view"><p className="wait">Press the button on your Hue Bridge to finish linking.</p></div>}
-          {hue === 'on' && <div className="view"><p className="reading"><b>{w} W</b>on lighting now</p></div>}
+          {hue === 'on' && home && <div className="view"><p className="reading"><b>{w} W</b>on lighting now</p></div>}
         </div>
 
         <div className="card src" data-state={oct}>
