@@ -1,6 +1,6 @@
-import { Recycle, Bus, Zap, Droplet, Pencil } from 'lucide-react';
+import { Recycle, Bus, Zap, Droplet, Trash2 } from 'lucide-react';
 
-export default function ActivityCard({ title, category, points, impactText, onEdit }) {
+export default function ActivityCard({ title, category, points, impactText, time, onDelete }) {
   const getCategoryIcon = (cat) => {
     switch (cat?.toLowerCase()) {
       case 'waste':
@@ -39,19 +39,22 @@ export default function ActivityCard({ title, category, points, impactText, onEd
             <span className="text-xs font-medium text-gray-500 truncate">
               {impactText}
             </span>
+            {time && <span className="text-xs text-gray-400 shrink-0">· {time}</span>}
           </div>
         </div>
       </div>
 
-      {/* Edit Action Button */}
-      <button
-        type="button"
-        onClick={onEdit}
-        className="p-1.5 text-gray-400 hover:text-gray-600 rounded-full hover:bg-gray-50 transition-colors shrink-0 cursor-pointer"
-        aria-label="Edit activity"
-      >
-        <Pencil className="w-4 h-4 stroke-[1.75]" />
-      </button>
+      {/* Delete Action Button */}
+      {onDelete && (
+        <button
+          type="button"
+          onClick={onDelete}
+          className="p-1.5 text-gray-400 hover:text-red-600 rounded-full hover:bg-red-50 transition-colors shrink-0 cursor-pointer"
+          aria-label={`Delete ${title}`}
+        >
+          <Trash2 className="w-4 h-4 stroke-[1.75]" />
+        </button>
+      )}
     </div>
   );
 }

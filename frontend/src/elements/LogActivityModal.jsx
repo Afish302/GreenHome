@@ -1,74 +1,68 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { X, Zap, Recycle, Bus, Droplet, Sprout } from 'lucide-react';
+import { supabase } from '../lib/supabaseClient';
+import { IMPACT_LABEL } from '../lib/impactUnits';
 
+// Category metadata matching the 4-in-a-row compact design
+const categories = [
+  { id: 'Energy', label: 'Energy', icon: Zap },
+  { id: 'Waste', label: 'Waste', icon: Recycle },
+  { id: 'Transport', label: 'Transport', icon: Bus },
+  { id: 'Water', label: 'Water', icon: Droplet },
+];
+
+// Activity options come from the activity_presets table. The numbers shown here are only a
+// preview: the database calculates the real points (log_activity), so they can't be faked.
+// onSave({ title, quantity }) must return { error } (null on success).
 export default function LogActivityModal({ isOpen, onClose, onSave }) {
+  const [presets, setPresets] = useState([]);
+  const [loadError, setLoadError] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('Waste');
   const [selectedActivity, setSelectedActivity] = useState('');
   const [quantity, setQuantity] = useState('1.5');
-  const [unit, setUnit] = useState('kg');
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState('');
+
+  useEffect(() => {
+    if (!isOpen) return;
+    supabase.from('activity_presets').select('*').order('title').then(({ data, error }) => {
+      if (error) setLoadError('Could not load activities. Please try again.');
+      else setPresets(data);
+    });
+  }, [isOpen]);
 
   if (!isOpen) return null;
 
-  // Category metadata matching the 4-in-a-row compact design
-  const categories = [
-    { id: 'Energy', label: 'Energy', icon: Zap },
-    { id: 'Waste', label: 'Waste', icon: Recycle },
-    { id: 'Transport', label: 'Transport', icon: Bus },
-    { id: 'Water', label: 'Water', icon: Droplet },
-  ];
+  const currentOptions = presets.filter((p) => p.category === selectedCategory.toLowerCase());
+  const activePreset = currentOptions.find((p) => p.title === selectedActivity) || currentOptions[0];
 
-  // Dynamic activity options per category
-  const activityPresets = {
-    Waste: [
-      { label: 'Composted Kitchen Waste', defaultUnit: 'kg', impactPerUnit: 2, ptsPerUnit: 10 },
-      { label: 'Recycled Plastic & Paper', defaultUnit: 'kg', impactPerUnit: 1.5, ptsPerUnit: 8 },
-      { label: 'Avoided Single-Use Plastic', defaultUnit: 'items', impactPerUnit: 0.5, ptsPerUnit: 5 },
-    ],
-    Energy: [
-      { label: 'Reduced Energy Use', defaultUnit: 'kWh', impactPerUnit: 2.5, ptsPerUnit: 10 },
-      { label: 'Switched to LED Bulbs', defaultUnit: 'bulbs', impactPerUnit: 1.2, ptsPerUnit: 5 },
-      { label: 'Air-Dried Laundry', defaultUnit: 'loads', impactPerUnit: 1.8, ptsPerUnit: 7 },
-    ],
-    Transport: [
-      { label: 'Used Public Transit', defaultUnit: 'km', impactPerUnit: 0.3, ptsPerUnit: 2 },
-      { label: 'Biked / Walked Trip', defaultUnit: 'km', impactPerUnit: 0.5, ptsPerUnit: 4 },
-      { label: 'Carpooled to Work', defaultUnit: 'trips', impactPerUnit: 2.0, ptsPerUnit: 10 },
-    ],
-    Water: [
-      { label: 'Collected Rainwater', defaultUnit: 'L', impactPerUnit: 1, ptsPerUnit: 1 },
-      { label: 'Shortened Shower Time', defaultUnit: 'mins', impactPerUnit: 5, ptsPerUnit: 2 },
-      { label: 'Fixed Water Leak', defaultUnit: 'fixes', impactPerUnit: 15, ptsPerUnit: 15 },
-    ],
-  };
+  // Same formulas as log_activity, for the preview only
+  const qtyNum = parseFloat(quantity);
+  const validQty = activePreset && qtyNum > 0 && qtyNum <= activePreset.max_quantity;
+  const calculatedImpact = activePreset && validQty ? (qtyNum * activePreset.impact_per_unit).toFixed(1) : '0.0';
+  const calculatedPts = activePreset && validQty ? Math.round(qtyNum * activePreset.pts_per_unit) : 0;
 
-  // Handle switching category: auto-select the first activity of that category
+  // Switching category selects that category's first activity
   const handleCategoryChange = (catId) => {
     setSelectedCategory(catId);
-    const firstOption = activityPresets[catId][0];
-    setSelectedActivity(firstOption.label);
-    setUnit(firstOption.defaultUnit);
+    setSelectedActivity('');
   };
 
-  const currentOptions = activityPresets[selectedCategory] || [];
-  const activePreset = currentOptions.find((a) => a.label === selectedActivity) || currentOptions[0];
-
-  // Calculate dynamic savings & points
-  const qtyNum = parseFloat(quantity) || 0;
-  const calculatedImpact = (qtyNum * (activePreset?.impactPerUnit || 1)).toFixed(1);
-  const calculatedPts = Math.round(qtyNum * (activePreset?.ptsPerUnit || 5));
-
-  const handleSave = () => {
-    if (onSave) {
-      onSave({
-        category: selectedCategory,
-        title: selectedActivity || currentOptions[0]?.label,
-        quantity: qtyNum,
-        unit,
-        impactText: `saved ${calculatedImpact} ${selectedCategory === 'Waste' ? 'kg CO₂' : selectedCategory === 'Energy' ? 'kWh' : selectedCategory === 'Water' ? 'L water' : 'kg CO₂'}`,
-        points: calculatedPts,
-      });
+  const handleSave = async () => {
+    if (!validQty || saving) return;
+    setSaving(true);
+    setSaveError('');
+    let error;
+    try {
+      ({ error } = await onSave({ title: activePreset.title, quantity: qtyNum }));
+    } catch (err) {
+      error = err; // never leave the button stuck on "Saving…"
     }
-    onClose();
+    setSaving(false);
+    if (error) {
+      console.error('Log activity failed:', error);
+      setSaveError(error.message || 'Could not save. Please try again.');
+    } else onClose();
   };
 
   return (
@@ -123,17 +117,15 @@ export default function LogActivityModal({ isOpen, onClose, onSave }) {
           <label className="text-xs font-bold text-gray-700">Activity</label>
           <div className="relative">
             <select
-              value={selectedActivity || currentOptions[0]?.label}
-              onChange={(e) => {
-                setSelectedActivity(e.target.value);
-                const preset = currentOptions.find((opt) => opt.label === e.target.value);
-                if (preset) setUnit(preset.defaultUnit);
-              }}
+              value={activePreset?.title || ''}
+              onChange={(e) => setSelectedActivity(e.target.value)}
+              disabled={!presets.length}
               className="w-full px-4 py-3 bg-gray-50/70 border border-gray-100 rounded-2xl text-sm font-semibold text-gray-900 focus:outline-none focus:ring-2 focus:ring-emerald-700 appearance-none cursor-pointer"
             >
+              {!presets.length && <option>{loadError || 'Loading…'}</option>}
               {currentOptions.map((opt) => (
-                <option key={opt.label} value={opt.label}>
-                  {opt.label}
+                <option key={opt.title} value={opt.title}>
+                  {opt.title}
                 </option>
               ))}
             </select>
@@ -149,13 +141,21 @@ export default function LogActivityModal({ isOpen, onClose, onSave }) {
           <div className="flex items-center gap-2 bg-gray-50/70 border border-gray-100 rounded-2xl px-4 py-2">
             <input
               type="number"
+              min="0"
+              max={activePreset?.max_quantity}
+              step="any"
               value={quantity}
               onChange={(e) => setQuantity(e.target.value)}
               className="w-full text-base font-bold text-gray-900 bg-transparent focus:outline-none"
               placeholder="0.0"
             />
-            <span className="text-xs font-semibold text-gray-400 capitalize">{unit}</span>
+            <span className="text-xs font-semibold text-gray-400">{activePreset?.unit}</span>
           </div>
+          {activePreset && !validQty && (
+            <p className="text-xs text-red-600">
+              Enter an amount above 0 and up to {activePreset.max_quantity} {activePreset.unit}.
+            </p>
+          )}
         </div>
 
         {/* 4. Estimated Savings Summary Box */}
@@ -163,7 +163,7 @@ export default function LogActivityModal({ isOpen, onClose, onSave }) {
           <div className="flex items-center gap-2.5 text-[#1E6B35]">
             <Sprout className="w-5 h-5" />
             <span className="text-xs font-bold">
-              Estimated savings: {calculatedImpact} {selectedCategory === 'Water' ? 'L water' : selectedCategory === 'Energy' ? 'kWh' : 'kg CO₂'}
+              Estimated savings: {calculatedImpact} {IMPACT_LABEL[activePreset?.impact_unit] ?? activePreset?.impact_unit}
             </span>
           </div>
           <span className="text-xs font-extrabold text-[#1E6B35] bg-white/80 px-2.5 py-1 rounded-full">
@@ -171,13 +171,16 @@ export default function LogActivityModal({ isOpen, onClose, onSave }) {
           </span>
         </div>
 
+        {saveError && <p className="text-xs text-red-600 text-center">{saveError}</p>}
+
         {/* 5. CTA Button */}
         <button
           type="button"
           onClick={handleSave}
-          className="w-full py-3.5 bg-[#1E6B35] hover:bg-emerald-900 text-white font-bold text-sm rounded-full shadow-md transition-all active:scale-[0.99] cursor-pointer"
+          disabled={!validQty || saving}
+          className="w-full py-3.5 bg-[#1E6B35] hover:bg-emerald-900 disabled:bg-gray-300 disabled:cursor-not-allowed text-white font-bold text-sm rounded-full shadow-md transition-all active:scale-[0.99] cursor-pointer"
         >
-          Save Activity
+          {saving ? 'Saving…' : 'Save Activity'}
         </button>
       </div>
     </div>

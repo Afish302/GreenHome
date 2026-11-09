@@ -1,58 +1,86 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ArrowLeft, Plus, Search } from 'lucide-react';
+import { supabase } from '../lib/supabaseClient';
+import { useAuth } from '../context/useAuth';
 
 // Components & Elements
 import ActivityCard from '../components/ActivityCard';
 import LogActivityModal from '../elements/LogActivityModal';
+import { IMPACT_LABEL } from '../lib/impactUnits';
+
+const DAY = 864e5;
+
+// activities row -> what the card and filters need
+function toView(row) {
+  const at = new Date(row.created_at);
+  return {
+    id: row.id,
+    title: row.title,
+    category: row.category,
+    points: row.points,
+    impactText: row.impact_value != null ? `saved ${row.impact_value} ${IMPACT_LABEL[row.impact_unit] ?? row.impact_unit}` : '',
+    time: at.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }),
+    day: at.toDateString(),
+    at,
+  };
+}
+
+// "Today" / "Yesterday" / "Monday", with the date on the right
+function dayLabels(day) {
+  const d = new Date(day);
+  const today = new Date().toDateString();
+  const yesterday = new Date(Date.now() - DAY).toDateString();
+  const name = day === today ? 'Today' : day === yesterday ? 'Yesterday' : d.toLocaleDateString([], { weekday: 'long' });
+  return [name, d.toLocaleDateString([], { month: 'long', day: 'numeric' })];
+}
 
 export default function Activities() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [activities, setActivities] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   const categories = ['All', 'Energy', 'Waste', 'Transport', 'Water'];
 
-  // Static mock dataset matching Figma design entries
-  const [activities] = useState([
-    {
-      id: 1,
-      title: 'Composted Kitchen Waste',
-      category: 'Waste',
-      points: 15,
-      impactText: 'saved 3 kg CO₂',
-      time: 'Today, 10:15 AM',
-      group: 'Today',
-    },
-    {
-      id: 2,
-      title: 'Used Public Transit',
-      category: 'Transport',
-      points: 20,
-      impactText: 'saved 4.2 kg CO₂',
-      time: 'Today, 8:30 AM',
-      group: 'Today',
-    },
-    {
-      id: 3,
-      title: 'Reduced Energy Use',
-      category: 'Energy',
-      points: 10,
-      impactText: 'saved 2.5 kWh',
-      time: 'Yesterday, 7:00 PM',
-      group: 'Yesterday',
-    },
-    {
-      id: 4,
-      title: 'Collected Rainwater',
-      category: 'Water',
-      points: 10,
-      impactText: 'saved 20 L water',
-      time: 'Yesterday, 9:45 AM',
-      group: 'Yesterday',
-    },
-  ]);
+  // The "Read own activities" policy only returns this user's rows, so no user filter is needed.
+  // ponytail: loads the whole history; add .limit() / paging if lists get long.
+  useEffect(() => {
+    if (!user) return;
+    let cancelled = false;
+    supabase.from('activities').select('*').order('created_at', { ascending: false })
+      .then(({ data, error }) => {
+        if (cancelled) return;
+        if (error) setError('Could not load your activities.');
+        else setActivities(data.map(toView));
+        setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, [user]);
+
+  // Points are calculated by the database (log_activity), never sent from here.
+  const handleSave = async ({ title, quantity }) => {
+    const { data, error } = await supabase.rpc('log_activity', { p_title: title, p_quantity: quantity });
+    if (error) return { error };
+    if (!data?.id) return { error: new Error('Saved, but no activity came back. Reload the page.') };
+    setActivities((list) => [toView(data), ...list]);
+    return { error: null };
+  };
+
+  const handleDelete = async (act) => {
+    if (!window.confirm(`Delete "${act.title}"? This removes its ${act.points} pts.`)) return;
+    const { error } = await supabase.rpc('delete_activity', { p_id: act.id });
+    if (error) return window.alert('Could not delete this activity. Please try again.');
+    setActivities((list) => list.filter((a) => a.id !== act.id));
+  };
+
+  const weekPts = activities
+    .filter((a) => a.at > Date.now() - 7 * DAY)
+    .reduce((sum, a) => sum + a.points, 0);
 
   // Client-side filtering logic for Search and Category Pills
   const filteredActivities = activities.filter((act) => {
@@ -64,8 +92,13 @@ export default function Activities() {
     return matchesCategory && matchesSearch;
   });
 
-  const todayList = filteredActivities.filter((a) => a.group === 'Today');
-  const yesterdayList = filteredActivities.filter((a) => a.group === 'Yesterday');
+  // Group by calendar day, newest first (the list is already sorted)
+  const groups = [];
+  for (const act of filteredActivities) {
+    const last = groups[groups.length - 1];
+    if (last && last.day === act.day) last.items.push(act);
+    else groups.push({ day: act.day, items: [act] });
+  }
 
   return (
     <div className="space-y-6">
@@ -134,65 +167,60 @@ export default function Activities() {
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold text-gray-900">Activity History</h2>
           <span className="text-xs font-bold text-emerald-700">
-            +55 pts this week
+            +{weekPts} pts this week
           </span>
         </div>
 
-        {filteredActivities.length === 0 ? (
+        {loading || error ? (
+          <p className="text-sm text-center text-gray-500 py-10">{error || 'Loading…'}</p>
+        ) : filteredActivities.length === 0 ? (
           <div className="text-center py-10 bg-white rounded-3xl border border-gray-100 space-y-1">
-            <p className="text-sm font-bold text-gray-700">No activities found</p>
-            <p className="text-xs text-gray-400">Try adjusting your category filter or search term.</p>
+            {activities.length === 0 ? (
+              <>
+                <p className="text-sm font-bold text-gray-700">No activities yet</p>
+                <p className="text-xs text-gray-400">Tap “Log New Activity” to add your first one.</p>
+              </>
+            ) : (
+              <>
+                <p className="text-sm font-bold text-gray-700">No activities found</p>
+                <p className="text-xs text-gray-400">Try adjusting your category filter or search term.</p>
+              </>
+            )}
           </div>
         ) : (
           <div className="space-y-5">
-            {/* Today Group */}
-            {todayList.length > 0 && (
-              <div className="space-y-2.5">
-                <div className="flex items-center justify-between text-xs text-gray-400 font-semibold px-1">
-                  <span>Today</span>
-                  <span>October 7</span>
+            {groups.map(({ day, items }) => {
+              const [name, date] = dayLabels(day);
+              return (
+                <div key={day} className="space-y-2.5">
+                  <div className="flex items-center justify-between text-xs text-gray-400 font-semibold px-1">
+                    <span>{name}</span>
+                    <span>{date}</span>
+                  </div>
+                  {items.map((act) => (
+                    <ActivityCard
+                      key={act.id}
+                      title={act.title}
+                      category={act.category}
+                      points={act.points}
+                      impactText={act.impactText}
+                      time={act.time}
+                      onDelete={() => handleDelete(act)}
+                    />
+                  ))}
                 </div>
-                {todayList.map((act) => (
-                  <ActivityCard
-                    key={act.id}
-                    title={act.title}
-                    category={act.category}
-                    points={act.points}
-                    impactText={act.impactText}
-                    time={act.time}
-                  />
-                ))}
-              </div>
-            )}
-
-            {/* Yesterday Group */}
-            {yesterdayList.length > 0 && (
-              <div className="space-y-2.5">
-                <div className="flex items-center justify-between text-xs text-gray-400 font-semibold px-1">
-                  <span>Yesterday</span>
-                  <span>October 6</span>
-                </div>
-                {yesterdayList.map((act) => (
-                  <ActivityCard
-                    key={act.id}
-                    title={act.title}
-                    category={act.category}
-                    points={act.points}
-                    impactText={act.impactText}
-                    time={act.time}
-                  />
-                ))}
-              </div>
-            )}
+              );
+            })}
           </div>
         )}
       </section>
 
-      {/* 6. Modal Trigger Placeholder */}
-      {isModalOpen && LogActivityModal && (
+      {/* 6. Log Activity Modal */}
+      {isModalOpen && (
         <LogActivityModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
+          onSave={handleSave}
         />
       )}
     </div>
