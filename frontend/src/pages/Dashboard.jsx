@@ -127,14 +127,14 @@ export default function Dashboard() {
             label="Carbon Saved"
             value={String(userProfile.carbonSaved)}
             type="kg"
-            subtext={userProfile.energySubtext}
+            subtext={`Rating ${userProfile.activityCount} logged activites`}
           />
           <MetricCard
             icon={<Zap className="w-4 h-4 text-emerald-600" />}
             label="Energy Efficiency"
             value={userProfile.energyRating}
             type=""
-            subtext={userProfile.energySubtext}
+            subtext={`Rating ${userProfile.energyRating} - ${userProfile.energySubtext}`}
           />
         </div>
       </section>

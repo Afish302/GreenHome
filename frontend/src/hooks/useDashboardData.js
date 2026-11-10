@@ -51,7 +51,25 @@ export function useDashboardData() {
           .maybeSingle();
  
         if (usageError) throw usageError;
- 
+        
+        // 3. get user activities to calculate CO2 & Energy savings
+        const { data: activities, error: activitiesError } = await supabase
+          .from('activities')
+          .select('co2_saved_kg, impact_value, impact_unit')
+          .eq('user_id', row.id);
+
+        if (activitiesError) throw activitiesError;
+
+        let carbonSavedKg = 0;
+        let energySavedKwh = 0;
+        for (const act of activities) {
+          carbonSavedKg += Number(act.co2_saved_kg) || 0;
+          // Only energy activities store kWh in impact_value (water ones store litres)
+          if (act.impact_unit === 'kwh') {
+            energySavedKwh += Number(act.impact_value) || 0;
+          }
+        }
+
         const score = row.Score ?? 0;
         const energy = getEnergyRating(usage?.ElectricityUsage);
  
@@ -59,7 +77,9 @@ export function useDashboardData() {
           setData({
             userName: row.UserName || 'there',
             score,
-            carbonSaved: Math.round(score * 0.1),
+            carbonSaved: Number(carbonSavedKg.toFixed(1)),
+            energySaved: Number(energySavedKwh.toFixed(1)),
+            activityCount: activities.length,
             energyRating: energy.rating,
             energySubtext: energy.subtext,
           });
