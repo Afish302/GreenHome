@@ -12,35 +12,20 @@ import Button from '../components/button';
 export default function Dashboard() {
   const navigate = useNavigate();
   // get user data from dashboard
-  const { data: userProfile, loading, error } = useDashboardData();
+  const { data: userProfile, loading, error, joinCommunity } = useDashboardData();
+  const [joiningId, setJoiningId] = useState(null); // which group is being joined right now
 
+  async function handleJoin(groupId) {
+    setJoiningId(groupId);
+    const { error: joinError } = await joinCommunity(groupId);
+    setJoiningId(null);
+    if (joinError) {
+      console.error('Join failed:', joinError);
+      alert('Could not join this community. Please try again.');
+    }
+  }
   // todo: fetch dynamically
-  const communities = [
-    {
-      id: 1,
-      name: 'Neighborhood Recycling',
-      members: '248 members',
-      tag: 'Recycling week',
-      joined: true,
-      image: 'https://images.unsplash.com/photo-1532996122724-e3c354a0b15b?auto=format&fit=crop&w=120&q=80',
-    },
-    {
-      id: 2,
-      name: 'Solar Powered Homes',
-      members: '186 members',
-      tag: 'Sun-powered October',
-      joined: false,
-      image: 'https://images.unsplash.com/photo-1508873696983-2df515122519?auto=format&fit=crop&w=120&q=80',
-    },
-    {
-      id: 3,
-      name: 'Zero Waste Club',
-      members: '512 members',
-      tag: 'Plastic-free week',
-      joined: false,
-      image: 'https://images.unsplash.com/photo-1542601906990-b4d3fb778b09?auto=format&fit=crop&w=120&q=80',
-    },
-  ];
+
   const getStatusText= (score) => {
     if(score >= 200) return 'Growing greener.';
     if(score >= 500)  return 'Making progress';
@@ -182,14 +167,25 @@ export default function Dashboard() {
                 </div>
               </div>
 
-              <Button
-                variant={item.joined ? 'outline' : 'primary'}
-                size="sm"
-                className="shrink-0 rounded-full px-4 text-xs font-bold"
-                navigate="/community"
-              >
-                {item.joined ? 'View' : 'Join'}
-              </Button>
+              {item.joined ? (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="shrink-0 rounded-full px-4 text-xs font-bold"
+                  navigate="/community"
+                >
+                  View
+                </Button>
+              ) : (
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="shrink-0 rounded-full px-4 text-xs font-bold"
+                  onClick={() => handleJoin(item.id)}
+                >
+                  {joiningId === item.id ? 'Joining…' : 'Join'}
+                </Button>
+              )}
             </div>
           ))} 
         </div>

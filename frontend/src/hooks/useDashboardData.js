@@ -100,7 +100,8 @@ export function useDashboardData() {
 
         const score = row.Score ?? 0;
         const energy = getEnergyRating(usage?.ElectricityUsage);
- 
+        
+        // Set data relevant for user dashboard
         if (!cancelled) {
           setData({
             userName: row.UserName || 'there',
@@ -108,9 +109,10 @@ export function useDashboardData() {
             carbonSaved: Number(carbonSavedKg.toFixed(1)),
             energySaved: Number(energySavedKwh.toFixed(1)),
             activityCount: activities.length,
-            communities,
-            energyRating: energy.rating,
-            energySubtext: energy.subtext,
+            communities, // communites on dashboard
+            userDbId: row.id, //Users.id required for join group
+            energyRating: energy.rating, // energy rating on dashbaord
+            energySubtext: energy.subtext, // energy subtext on dashboard
           });
         }
       } catch (err) {
@@ -127,6 +129,24 @@ export function useDashboardData() {
     };
   }, [userId]);
  
-  return { data, loading, error };
+  // Joins a community with Finn's join_group function, then marks it as joined
+  // on screen without reloading the whole dashboard. Returns { error }.
+  async function joinCommunity(groupId) {
+    const { error: joinError } = await supabase.rpc('join_group', {
+      input_user_id: data.userDbId,
+      input_group_id: groupId,
+    });
+    if (joinError) return { error: joinError };
+
+    setData((prev) => ({
+      ...prev,
+      communities: prev.communities.map((c) =>
+        c.id === groupId ? { ...c, joined: true, memberCount: c.memberCount + 1 } : c
+      ),
+    }));
+    return { error: null };
+  }
+
+  return { data, loading, error, joinCommunity };
 }
  
