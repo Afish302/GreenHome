@@ -1,17 +1,22 @@
 import Footer from '../components/footer'
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef} from 'react';
 import { AlertCircle, CircleCheck, ImagePlus, Lightbulb, LoaderCircle, Upload } from 'lucide-react';
 import { classifyImage, preloadClassifier } from '../lib/classifier';
 import ResultsCard from '../components/ResultsCard';
+import { recordScan } from '../lib/scoring';
+import { useAuth } from '../context/useAuth';
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 
 export default function RecyclingScanner() {
+  const { user } = useAuth();
   const [status, setStatus] = useState('idle'); // idle | classifying | done | error
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
   const [previewUrl, setPreviewUrl] = useState(null);
   const [dragging, setDragging] = useState(false);
+  const [saveStatus, setSaveStatus] = useState('idle'); // idle | saving | saved | error
+  const scanId = useRef(0); // lets us ignore a save that finishes after a newer scan started
 
   // Start loading the model in the background when the page opens
   useEffect(() => {
@@ -24,6 +29,19 @@ export default function RecyclingScanner() {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
   }, [previewUrl]);
+
+  // Adds the points for this item to the user's score, once per scan
+  async function saveScan(category, id) {
+    if (!user) return;
+    setSaveStatus('saving');
+    try {
+      await recordScan(user.id, category);
+      if (id === scanId.current) setSaveStatus('saved');
+    } catch (err) {
+      console.error('Saving points failed:', err);
+      if (id === scanId.current) setSaveStatus('error');
+    }
+  }
 
   async function processFile(file) {
     if (!file) return;
@@ -51,9 +69,14 @@ export default function RecyclingScanner() {
     setStatus('classifying');
     setResult(null);
     setError('');
+    setSaveStatus('idle');
+    const id = ++scanId.current;
     try {
-      setResult(await classifyImage(file));
+      const classified = await classifyImage(file);
+      setResult(classified);
       setStatus('done');
+      // A confident result scores straight away. Otherwise the user picks first.
+      if (classified.confident) saveScan(classified.top[0].category, id);
     } catch (err) {
       console.error(err);
       setError('Failed to classify the image. Please try again.');
@@ -151,7 +174,13 @@ export default function RecyclingScanner() {
             <p>{error}</p>
           </div>
         )}
-        {status === 'done' && result && <ResultsCard results={result} />}
+        {status === 'done' && result && (
+          <ResultsCard
+            results={result}
+            saveStatus={saveStatus}
+            onPick={(category) => saveScan(category, scanId.current)}
+          />
+        )}
 
         {/* Tips */}
 
