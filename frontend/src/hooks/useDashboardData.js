@@ -69,6 +69,34 @@ export function useDashboardData() {
             energySavedKwh += Number(act.impact_value) || 0;
           }
         }
+                // 4. Communities ("groups" table) with their member counts.
+        //    groupUserLink(count) asks Supabase to count the linked rows for each group.
+        const { data: groups, error: groupsError } = await supabase
+          .from('groups')
+          .select('groupID, GroupName, groupUserLink(count)');
+
+        if (groupsError) throw groupsError;
+
+        // Which groups this user is already in
+        const { data: myLinks, error: linksError } = await supabase
+          .from('groupUserLink')
+          .select('groupID')
+          .eq('userID', row.id);
+
+        if (linksError) throw linksError;
+
+        // 
+        const myGroupIds = myLinks.map((link) => link.groupID);
+        const communities = groups
+          .map((group) => ({
+            id: group.groupID,
+            name: group.GroupName,
+            memberCount: group.groupUserLink[0]?.count ?? 0,
+            joined: myGroupIds.includes(group.groupID),
+          }))
+          // joined groups first, then the biggest groups
+          .sort((a, b) => (b.joined - a.joined) || (b.memberCount - a.memberCount))
+          .slice(0, 3);
 
         const score = row.Score ?? 0;
         const energy = getEnergyRating(usage?.ElectricityUsage);
@@ -80,6 +108,7 @@ export function useDashboardData() {
             carbonSaved: Number(carbonSavedKg.toFixed(1)),
             energySaved: Number(energySavedKwh.toFixed(1)),
             activityCount: activities.length,
+            communities,
             energyRating: energy.rating,
             energySubtext: energy.subtext,
           });

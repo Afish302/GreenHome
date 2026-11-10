@@ -156,27 +156,29 @@ export default function Dashboard() {
         </div>
 
         <div className="space-y-2.5">
-          {communities.map((item) => (
+                    {userProfile.communities.length === 0 && (
+            <p className="text-xs text-gray-500">No communities yet.</p>
+          )}
+          {userProfile.communities.map((item) => (
             <div
               key={item.id}
               className="bg-white p-3 rounded-2xl border border-gray-100 flex items-center justify-between gap-3 shadow-xs hover:border-gray-200 transition-all"
             >
               <div className="flex items-center gap-3">
-                <img
-                  src={item.image}
-                  alt={item.name}
-                  className="w-11 h-11 rounded-xl object-cover shrink-0"
-                />
+                {/* No image column in the groups table yet, so show the first letter */}
+                <div className="w-11 h-11 rounded-xl bg-[#E8F5E9] text-[var(--color-forest,#15803d)] font-bold flex items-center justify-center shrink-0">
+                  {item.name.charAt(0)}
+                </div>
                 <div className="space-y-1 min">
                   <h4 className="text-xs font-bold text-gray-900 leading-none">
                     {item.name}
                   </h4>
                   <p className="text-[11px] text-gray-400 font-medium">
-                    {item.members}
+                    {item.memberCount} members
                   </p>
-                  <Badge variant="emerald" size="sm" label={'• ' + item.tag}>
-                    • {item.tag}
-                  </Badge>
+                  {item.joined && (
+                    <Badge variant="emerald" size="sm" label="• Joined" />
+                  )}
                 </div>
               </div>
 
@@ -184,11 +186,12 @@ export default function Dashboard() {
                 variant={item.joined ? 'outline' : 'primary'}
                 size="sm"
                 className="shrink-0 rounded-full px-4 text-xs font-bold"
+                navigate="/community"
               >
                 {item.joined ? 'View' : 'Join'}
               </Button>
             </div>
-          ))}
+          ))} 
         </div>
       </section>
 
