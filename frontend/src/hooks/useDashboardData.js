@@ -51,17 +51,68 @@ export function useDashboardData() {
           .maybeSingle();
  
         if (usageError) throw usageError;
- 
+        
+        // 3. get user activities to calculate CO2 & Energy savings
+        const { data: activities, error: activitiesError } = await supabase
+          .from('activities')
+          .select('co2_saved_kg, impact_value, impact_unit')
+          .eq('user_id', row.id);
+
+        if (activitiesError) throw activitiesError;
+
+        let carbonSavedKg = 0;
+        let energySavedKwh = 0;
+        for (const act of activities) {
+          carbonSavedKg += Number(act.co2_saved_kg) || 0;
+          // Only energy activities store kWh in impact_value (water ones store litres)
+          if (act.impact_unit === 'kwh') {
+            energySavedKwh += Number(act.impact_value) || 0;
+          }
+        }
+                // 4. Communities ("groups" table) with their member counts.
+        //    groupUserLink(count) asks Supabase to count the linked rows for each group.
+        const { data: groups, error: groupsError } = await supabase
+          .from('groups')
+          .select('groupID, GroupName, groupUserLink(count)');
+
+        if (groupsError) throw groupsError;
+
+        // Which groups this user is already in
+        const { data: myLinks, error: linksError } = await supabase
+          .from('groupUserLink')
+          .select('groupID')
+          .eq('userID', row.id);
+
+        if (linksError) throw linksError;
+
+        // 
+        const myGroupIds = myLinks.map((link) => link.groupID);
+        const communities = groups
+          .map((group) => ({
+            id: group.groupID,
+            name: group.GroupName,
+            memberCount: group.groupUserLink[0]?.count ?? 0,
+            joined: myGroupIds.includes(group.groupID),
+          }))
+          // joined groups first, then the biggest groups
+          .sort((a, b) => (b.joined - a.joined) || (b.memberCount - a.memberCount))
+          .slice(0, 3);
+
         const score = row.Score ?? 0;
         const energy = getEnergyRating(usage?.ElectricityUsage);
- 
+        
+        // Set data relevant for user dashboard
         if (!cancelled) {
           setData({
             userName: row.UserName || 'there',
             score,
-            carbonSaved: Math.round(score * 0.1),
-            energyRating: energy.rating,
-            energySubtext: energy.subtext,
+            carbonSaved: Number(carbonSavedKg.toFixed(1)),
+            energySaved: Number(energySavedKwh.toFixed(1)),
+            activityCount: activities.length,
+            communities, // communites on dashboard
+            userDbId: row.id, //Users.id required for join group
+            energyRating: energy.rating, // energy rating on dashbaord
+            energySubtext: energy.subtext, // energy subtext on dashboard
           });
         }
       } catch (err) {
@@ -78,6 +129,24 @@ export function useDashboardData() {
     };
   }, [userId]);
  
-  return { data, loading, error };
+  // Joins a community with Finn's join_group function, then marks it as joined
+  // on screen without reloading the whole dashboard. Returns { error }.
+  async function joinCommunity(groupId) {
+    const { error: joinError } = await supabase.rpc('join_group', {
+      input_user_id: data.userDbId,
+      input_group_id: groupId,
+    });
+    if (joinError) return { error: joinError };
+
+    setData((prev) => ({
+      ...prev,
+      communities: prev.communities.map((c) =>
+        c.id === groupId ? { ...c, joined: true, memberCount: c.memberCount + 1 } : c
+      ),
+    }));
+    return { error: null };
+  }
+
+  return { data, loading, error, joinCommunity };
 }
  

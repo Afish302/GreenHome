@@ -4,7 +4,7 @@ import PrimaryButton from '../components/button';
 import {useAuth} from '../context/useAuth';
 
 // redirect path after login
-const AFTER_LOGIN_PATH = '/';
+const AFTER_LOGIN_PATH = '/dashboard';
 
 function loginError(message){
   if(message === 'Invalid login credentials') return 'Wrong email or password. Please try again';

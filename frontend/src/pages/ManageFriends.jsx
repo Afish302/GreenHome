@@ -21,7 +21,11 @@ export default function ManageFriends() {
         }
 
         // gets the logged in user ID from the Users table
-        supabase.from('Users').select('id').eq('email', user.email).single()
+        supabase
+            .from('Users')
+            .select('id')
+            .eq('email', user.email)
+            .single()
             .then(function (result) {
                 const input_user_id = result.data.id
                 updateMyID(input_user_id)
@@ -37,10 +41,7 @@ export default function ManageFriends() {
 
     // gets the users row from the list
     const myRow = friendsList.find(function (friend) {
-        if (friend.user_id == myID) {
-            return true
-        }
-        return false
+        return friend.user_id == myID
     })
 
     // takes the user out of the list
@@ -68,42 +69,42 @@ export default function ManageFriends() {
             })
     }
 
-  return (
-    <div className="space-y-3">
-        <div className="flex items-center">
-            <div className="flex flex-col">
-                <span className="font-bold">Manage Friends</span>
-                <span className="text-sm font-normal text-[#657065]">Friends List</span>
-            </div>
-            <Button variant="text" className="ml-auto" navigate="/community">Return</Button>
-        </div>
-
-        {loading == true && (
-            <p className="text-sm text-[#657065]">Loading…</p>
-        )}
-
-        {/* Friends Leaderboard */}
-        {loading == false && myRow && (
-            <div className="space-y-3">
-                <div className="flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden">
-                    {friendsOnly.map(function (friend, i) {
-                        return (
-                            <div key={friend.user_id} className="px-4 py-3 flex items-center gap-3 border-b border-slate-100 last:border-b-0">
-                                <div className="flex-1 flex items-center gap-3">
-                                    <span className="font-bold text-[var(--color-forest)]">{i + 1}</span>
-                                    <span className="font-semibold text-[var(--color-charcoal)]">{friend.username}</span>
-                                </div>
-                                <Button variant="text" onClick={function () { removeFriend(friend.user_id) }}>Remove friend</Button>
-                                <div className="flex-1 flex flex-col items-end">
-                                    <span className="text-sm font-bold">{friend.score}</span>
-                                    <span className="text-sm font-normal text-[#657065]">pts</span>
-                                </div>
-                            </div>
-                        );
-                    })}
+    return (
+        <div className="space-y-3">
+            <div className="flex items-center">
+                <div className="flex flex-col">
+                    <span className="font-bold">Manage Friends</span>
+                    <span className="text-sm font-normal text-[#657065]">Friends List</span>
                 </div>
+                <Button variant="text" className="ml-auto" navigate="/community">Return</Button>
             </div>
-        )}
-    </div>
-  );
+
+            {loading == true && (
+                <p className="text-sm text-[#657065]">Loading…</p>
+            )}
+
+            {/* Friends Leaderboard */}
+            {loading == false && myRow && (
+                <div className="space-y-3">
+                    <div className="flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden">
+                        {friendsOnly.map(function (friend, i) {
+                            return (
+                                <div key={friend.user_id} className="px-4 py-3 flex items-center gap-3 border-b border-slate-100 last:border-b-0">
+                                    <div className="flex-1 flex items-center gap-3">
+                                        <span className="font-bold text-[var(--color-forest)]">{i + 1}</span>
+                                        <span className="font-semibold text-[var(--color-charcoal)]">{friend.username}</span>
+                                    </div>
+                                    <Button variant="text" onClick={function () { removeFriend(friend.user_id) }}>Remove friend</Button>
+                                    <div className="flex-1 flex flex-col items-end">
+                                        <span className="text-sm font-bold">{friend.score}</span>
+                                        <span className="text-sm font-normal text-[#657065]">pts</span>
+                                    </div>
+                                </div>
+                            );
+                        })}
+                    </div>
+                </div>
+            )}
+        </div>
+    );
 }
