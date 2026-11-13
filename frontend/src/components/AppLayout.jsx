@@ -1,6 +1,6 @@
 /*import { useState } from 'react';*/
 import { Outlet, Link, useLocation } from 'react-router-dom';
-import { Leaf, LayoutDashboard, Users, Settings, ListTodo } from 'lucide-react';
+import { Leaf, LayoutDashboard, Users, Settings, ListTodo, ScanLine } from 'lucide-react';
 
 // Bottom navigation for mobile devices
 import BottomNav from './BottomNav';
@@ -19,6 +19,7 @@ export default function AppLayout({ showNavbar = true }) {
   const navItems = [
     { label: 'Home', path: '/dashboard', icon: LayoutDashboard },
     { label: 'Community', path: '/community', icon: Users },
+    { label: 'Scan', path: '/scanner', icon: ScanLine },
     { label: 'Activities', path: '/activities', icon: ListTodo },
     { label: 'Settings', path: '/settings', icon: Settings },
   ];
