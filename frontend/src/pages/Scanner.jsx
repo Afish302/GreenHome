@@ -1,17 +1,25 @@
 import Footer from '../components/footer'
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef, lazy, Suspense} from 'react';
 import { AlertCircle, CircleCheck, ImagePlus, Lightbulb, LoaderCircle, Upload } from 'lucide-react';
 import { classifyImage, preloadClassifier } from '../lib/classifier';
 import ResultsCard from '../components/ResultsCard';
+import { recordScan } from '../lib/scoring';
+import { useAuth } from '../context/useAuth';
+// Loaded only when the "My recycling" tab is opened, so the chart library doesn't slow down scanning
+const RecyclingChart = lazy(() => import('../components/RecyclingChart'));
 
 const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10 MB
 
 export default function RecyclingScanner() {
+  const { user } = useAuth();
+  const [tab, setTab] = useState('scan'); // scan | recycling
   const [status, setStatus] = useState('idle'); // idle | classifying | done | error
   const [result, setResult] = useState(null);
   const [error, setError] = useState('');
   const [previewUrl, setPreviewUrl] = useState(null);
   const [dragging, setDragging] = useState(false);
+  const [saveStatus, setSaveStatus] = useState('idle'); // idle | saving | saved | error
+  const scanId = useRef(0); // lets us ignore a save that finishes after a newer scan started
 
   // Start loading the model in the background when the page opens
   useEffect(() => {
@@ -24,6 +32,19 @@ export default function RecyclingScanner() {
       if (previewUrl) URL.revokeObjectURL(previewUrl);
     };
   }, [previewUrl]);
+
+  // Adds the points for this item to the user's score, once per scan
+  async function saveScan(category, id) {
+    if (!user) return;
+    setSaveStatus('saving');
+    try {
+      await recordScan(user.id, category);
+      if (id === scanId.current) setSaveStatus('saved');
+    } catch (err) {
+      console.error('Saving points failed:', err);
+      if (id === scanId.current) setSaveStatus('error');
+    }
+  }
 
   async function processFile(file) {
     if (!file) return;
@@ -51,9 +72,14 @@ export default function RecyclingScanner() {
     setStatus('classifying');
     setResult(null);
     setError('');
+    setSaveStatus('idle');
+    const id = ++scanId.current;
     try {
-      setResult(await classifyImage(file));
+      const classified = await classifyImage(file);
+      setResult(classified);
       setStatus('done');
+      // A confident result scores straight away. Otherwise the user picks first.
+      if (classified.confident) saveScan(classified.top[0].category, id);
     } catch (err) {
       console.error(err);
       setError('Failed to classify the image. Please try again.');
@@ -78,8 +104,32 @@ export default function RecyclingScanner() {
 
   return (
     <div className="mx-auto flex w-full max-w-2xl flex-col gap-5 font-sans">
-      {/* Body */}
-      <div className="flex flex-col gap-5">
+      {/* Tabs */}
+      <div
+        className="flex rounded-full bg-white p-1 shadow-sm outline outline-[1.3px] -outline-offset-[1.3px] outline-gray-200"
+        role="tablist"
+      >
+        {[
+          ['scan', 'Scan'],
+          ['recycling', 'My recycling'],
+        ].map(([id, label]) => (
+          <button
+            key={id}
+            type="button"
+            role="tab"
+            aria-selected={tab === id}
+            onClick={() => setTab(id)}
+            className={`flex-1 rounded-full px-4 py-2 text-sm font-semibold transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-forest/40 ${
+              tab === id ? 'bg-forest text-white' : 'text-charcoal-muted hover:text-charcoal'
+            }`}
+          >
+            {label}
+          </button>
+        ))}
+      </div>
+
+      {/* Scan tab. Hidden, not removed, so a result and its one-time pick survive switching tabs */}
+      <div className={tab === 'scan' ? 'flex flex-col gap-5' : 'hidden'}>
         <div className="flex flex-col gap-1.5">
           <h2 className="text-[28px] font-semibold leading-[34px] text-charcoal">Recycle it right.</h2>
           <p className="text-sm text-charcoal-muted">
@@ -151,7 +201,13 @@ export default function RecyclingScanner() {
             <p>{error}</p>
           </div>
         )}
-        {status === 'done' && result && <ResultsCard results={result} />}
+        {status === 'done' && result && (
+          <ResultsCard
+            results={result}
+            saveStatus={saveStatus}
+            onPick={(category) => saveScan(category, scanId.current)}
+          />
+        )}
 
         {/* Tips */}
 
@@ -173,6 +229,13 @@ export default function RecyclingScanner() {
         </div>
       </div>
 
+      {/* My recycling tab: loads fresh numbers each time it is opened */}
+      {tab === 'recycling' && (
+        <Suspense fallback={<p className="text-sm text-charcoal-muted" role="status">Loading...</p>}>
+          <RecyclingChart />
+        </Suspense>
+      )}
+      
       {/* Footer action */}
       <Footer/>
     </div>

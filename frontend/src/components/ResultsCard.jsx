@@ -17,8 +17,15 @@ const badgeStyle = (recyclability) =>
  * 'results' is what the classifyImage() returns: { top, confident, threshold }.
  * The card is remounted for each new photo, so the user's pick resets itself
  */
-export default function ResultsCard({ results }) {
+export default function ResultsCard({ results, saveStatus = 'idle', onPick }) {
   const [picked, setPicked] = useState(null);
+
+  // The first pick is final, so one photo can only score once
+  function handlePick(option) {
+    if (picked) return;
+    setPicked(option);
+    onPick?.(option);
+  }
 
   const category = results.confident ? results.top[0].category : picked;
   const rules = category ? getRules(category) : null;
@@ -48,11 +55,14 @@ export default function ResultsCard({ results }) {
                   type="button"
                   role="radio"
                   aria-checked={selected}
-                  onClick={() => setPicked(option)}
+                  onClick={() => handlePick(option)}
+                  disabled={picked !== null && !selected}
                   className={`flex items-center gap-3 rounded-xl border px-3.5 py-3 text-left text-sm transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-forest/40 ${
                     selected
                       ? 'border-forest bg-mint-light text-forest'
-                      : 'border-gray-200 text-charcoal hover:border-mint hover:bg-cream'
+                      : picked
+                        ? 'border-gray-200 text-charcoal opacity-50'
+                        : 'border-gray-200 text-charcoal hover:border-mint hover:bg-cream'
                   }`}
                 >
                   <span
@@ -101,6 +111,13 @@ export default function ResultsCard({ results }) {
             <span className="text-sm font-medium text-forest-dark">Points earned</span>
             <span className="text-lg font-bold tabular-nums text-forest">+{rules.points}</span>
           </div>
+          {saveStatus === 'saving' && <p className="text-xs text-charcoal-muted">Saving your points...</p>}
+          {saveStatus === 'saved' && <p className="text-xs font-medium text-forest">Added to your score</p>}
+          {saveStatus === 'error' && (
+            <p className="text-xs text-red-700" role="alert">
+              We couldn't save your points. Your result is still correct, so please try again later.
+            </p>
+          )}
         </div>
       )}
     </section>
