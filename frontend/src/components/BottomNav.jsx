@@ -1,5 +1,5 @@
 import { NavLink } from 'react-router-dom';
-import { Home, Users, ListChecks, Settings } from 'lucide-react';
+import { Home, Users, ListChecks, Settings, ScanLine } from 'lucide-react';
 
 export default function BottomNav() {
 
@@ -19,6 +19,11 @@ export default function BottomNav() {
       <NavLink to="/community" className={tabStyle}>
         <div className={iconStyle}><Users className="w-6 h-6" /></div>
         <span className={textStyle}>Community</span>
+      </NavLink>
+      {/* scanner */}
+      <NavLink to="/scanner" className={tabStyle}>
+        <div className={iconStyle}><ScanLine className="w-6 h-6" /></div>
+        <span className={textStyle}>Scan</span>
       </NavLink>
       {/* activities */}
       <NavLink to="/activities" className={tabStyle}>
