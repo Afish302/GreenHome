@@ -49,20 +49,6 @@ export default function CommuteAnswers() {
           </div>
         </section>
 
-        {/* Dietary Pattern */}
-        <section>
-          <div className="flex items-center gap-2 mb-3">
-            <Sprout className="text-[var(--color-forest-dark)]" size={24} />
-            <span className="font-bold">Dietary Pattern</span>
-          </div>
-          <div className="grid grid-cols-2 gap-3 [&>button]:relative [&_span]:!mx-auto [&_svg]:absolute [&_svg]:right-4 [&_svg]:top-1/2 [&_svg]:-translate-y-1/2">
-            <OptionCard label="Plant-Based / Vegan" className="!py-2 !rounded-3xl" selected={diet == 'vegan'} onClick={function () { updateDiet('vegan') }} />
-            <OptionCard label="Vegetarian" className="!py-2 !rounded-3xl" selected={diet == 'vegetarian'} onClick={function () { updateDiet('vegetarian') }} />
-            <OptionCard label="Flexitarian" className="!py-2 !rounded-3xl" selected={diet == 'flexitarian'} onClick={function () { updateDiet('flexitarian') }} />
-            <OptionCard label="Meat-Heavy" className="!py-2 !rounded-3xl" selected={diet == 'meat'} onClick={function () { updateDiet('meat') }} />
-          </div>
-        </section>
-
         {/* Household and Energy */}
         <section className="flex flex-col gap-y-3">
           <div className="flex items-center gap-2 mb-3">

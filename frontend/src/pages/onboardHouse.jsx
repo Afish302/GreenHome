@@ -38,11 +38,6 @@ export default function OnboardHouse() {
           </div>
           <p className="text-sm font-normal text-[#657065] -mt-4">Tell us about your living space</p>
 
-          <div className="flex items-center gap-2 mb-3">
-            <span>Number of occupants</span>
-            <NumberStepper value={number} onClick={updateNumber} />
-          </div>
-
           <p className="text-sm font-normal text-[#657065]">Home type</p>
           <div className="grid grid-cols-3 gap-3 [&>button]:relative [&_span]:!mx-auto [&_svg]:absolute [&_svg]:right-4 [&_svg]:top-1/2 [&_svg]:-translate-y-1/2">
             <OptionCard label="Apartment" className="!py-2 !rounded-3xl" selected={home == 'apartment'} onClick={function () { updateHome('apartment') }} />
