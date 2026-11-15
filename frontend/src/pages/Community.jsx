@@ -11,6 +11,7 @@ import Badge from '../components/badge';
 import Button from '../components/button';
 import OptionCard from '../components/OptionCard';
 import IconButton from '../components/IconButton';
+import MyCommunities from '../components/MyCommunities';
 
 export default function Community() {
     const [mainTab, updateMainTab] = useState('leaderboard')
@@ -264,6 +265,8 @@ export default function Community() {
                             )}
                         </div>
                     )}
+                    {/* My Communities tab */}
+                    {subTab == 'my communities' && <MyCommunities />}
                 </div>
             )}
 
