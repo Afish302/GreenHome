@@ -10,7 +10,7 @@ export default function OptionCard({ icon, label = 'TEXT HERE!', selected = fals
   // selected style
   if (selected) {
     style = "w-full flex items-center gap-3 px-4 py-4 rounded-2xl border text-left text-sm bg-[#EAF4E9] border-[#81C784] text-[var(--color-forest)] font-semibold cursor-pointer";
-    tick = <CircleCheck className="w-5 h-5 ml-auto" />;
+    tick = <CircleCheck className="w-5 h-5 ml-auto hidden sm:block" />;
   }
 
   return (

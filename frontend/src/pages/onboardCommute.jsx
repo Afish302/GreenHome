@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { supabase } from '../lib/supabaseClient'
+import { useAuth } from '../context/useAuth'
 import ProgressBar from '../components/ProgressBar'
 import OptionCard from '../components/OptionCard'
 import { BusFront, CarFront, Fuel, Bike, Sprout, HousePlug, Zap, FileUp, ScanLine, Leaf, ArrowLeft } from 'lucide-react'
@@ -12,8 +14,67 @@ export default function CommuteAnswers() {
   const [distance, updateDistance] = useState(0)
   const [diet, updateDiet] = useState(null)
   const [number, updateNumber] = useState(0)
+  const [myID, updateMyID] = useState(null)
   const electricityUsage = 0
   const estimatedFootprint = 0
+
+  const { user } = useAuth()
+
+  // loads the users saved answers
+  useEffect(function () {
+    // stops if nobody is logged in
+    if (user == null) {
+      return
+    }
+
+    // gets the logged in user ID from the Users table
+    supabase
+      .from('Users')
+      .select('id')
+      .eq('email', user.email)
+      .single()
+      .then(function (result) {
+        // stops if the user was not found
+        if (result.data == null) {
+          return
+        }
+
+        const input_user_id = result.data.id
+        updateMyID(input_user_id)
+
+        // gets the users saved answers
+        supabase
+          .from('onboarding')
+          .select('daily_commute, avg_daily_travel, occupants')
+          .eq('id', input_user_id)
+          .single()
+          .then(function (result) {
+            // stops if the user has no saved answers yet
+            if (result.data == null) {
+              return
+            }
+
+            updateCommute(result.data.daily_commute)
+            updateDistance(result.data.avg_daily_travel)
+            updateNumber(result.data.occupants)
+          })
+      })
+  }, [user])
+
+  // saves the users answers
+  function saveAnswers() {
+    supabase
+      .from('onboarding')
+      .upsert({
+        id: myID,
+        daily_commute: commute,
+        avg_daily_travel: distance,
+        occupants: number
+      })
+      .then(function (result) {
+        console.log(result)
+      })
+  }
 
   return (
     <div>
@@ -91,7 +152,7 @@ export default function CommuteAnswers() {
           <Leaf className="text-[var(--color-forest)]" size={20} />
           <span>Estimated Footprint: <span className="font-semibold text-[var(--color-forest)]">{estimatedFootprint} t CO₂e/yr</span></span>
         </div>
-        <Button navigate="/onboardFood" onClick={function () { window.scrollTo(0, 0) }} className="!w-full !rounded-full">Save & Calculate Footprint</Button>
+        <Button navigate="/onboardFood" onClick={function () { saveAnswers(); window.scrollTo(0, 0) }} className="!w-full !rounded-full">Save & Calculate Footprint</Button>
         </div>
       </div>
     </section>

@@ -1,4 +1,6 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
+import { supabase } from '../lib/supabaseClient'
+import { useAuth } from '../context/useAuth'
 import ProgressBar from '../components/ProgressBar'
 import OptionCard from '../components/OptionCard'
 import { BusFront, CarFront, Fuel, Bike, Sprout, HousePlug, Zap, FileUp, ScanLine, Leaf, ArrowLeft, Recycle, Carrot, Salad, Utensils } from 'lucide-react'
@@ -14,6 +16,70 @@ export default function OnboardHouse() {
   const [home, updateHome] = useState(null)
   const [number, updateNumber] = useState(0)
   const [electricity, updateElectricity] = useState(100)
+  const [greenEnergy, updateGreenEnergy] = useState(false)
+  const [myID, updateMyID] = useState(null)
+
+  const { user } = useAuth()
+
+  // loads the users saved answers
+  useEffect(function () {
+    // stops if nobody is logged in
+    if (user == null) {
+      return
+    }
+
+    // gets the logged in user ID from the Users table
+    supabase
+      .from('Users')
+      .select('id')
+      .eq('email', user.email)
+      .single()
+      .then(function (result) {
+        // stops if the user was not found
+        if (result.data == null) {
+          return
+        }
+
+        const input_user_id = result.data.id
+        updateMyID(input_user_id)
+
+        // gets the users saved answers
+        supabase
+          .from('onboarding')
+          .select('household_type, energy_usage, green_energy')
+          .eq('id', input_user_id)
+          .single()
+          .then(function (result) {
+            // stops if the user has no saved answers yet
+            if (result.data == null) {
+              return
+            }
+
+            updateHome(result.data.household_type)
+            if (result.data.energy_usage != null) {
+              updateElectricity(result.data.energy_usage)
+            }
+            if (result.data.green_energy != null) {
+              updateGreenEnergy(result.data.green_energy)
+            }
+          })
+      })
+  }, [user])
+
+  // saves the users answers
+  function saveAnswers() {
+    supabase
+      .from('onboarding')
+      .upsert({
+        id: myID,
+        household_type: home,
+        energy_usage: electricity,
+        green_energy: greenEnergy
+      })
+      .then(function (result) {
+        console.log(result)
+      })
+  }
 
   return (
     <div>
@@ -59,7 +125,7 @@ export default function OnboardHouse() {
           </div>
 
           <label className="flex items-center gap-2 mt-3 text-sm font-normal text-[#657065] cursor-pointer">
-            <input type="checkbox" className="w-5 h-5" />
+            <input type="checkbox" className="w-5 h-5" checked={greenEnergy} onChange={function (e) { updateGreenEnergy(e.target.checked) }} />
             My home uses green energy / solar power
           </label>
 
@@ -87,7 +153,7 @@ export default function OnboardHouse() {
           <Leaf className="text-[var(--color-forest)]" size={20} />
           <span>Estimated Footprint: <span className="font-semibold text-[var(--color-forest)]">{estimatedFootprint} t CO₂e/yr</span></span>
         </div>
-        <Button navigate="/dashboard" onClick={function () { window.scrollTo(0, 0) }} className="!w-full !rounded-full">Complete Setup & Go to Dashboard (3/3)</Button>
+        <Button navigate="/dashboard" onClick={function () { saveAnswers(); window.scrollTo(0, 0) }} className="!w-full !rounded-full">Complete Setup & Go to Dashboard (3/3)</Button>
         </div>
       </div>
     </section>
