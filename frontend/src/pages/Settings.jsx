@@ -1,9 +1,7 @@
 import { useState } from 'react'
-import ProgressBar from '../components/ProgressBar'
 import OptionCard from '../components/OptionCard'
 import { BusFront, Sprout, HousePlug, ChevronRight, Ruler, LogOut } from 'lucide-react'
 import Button from '../components/button'
-import IconButton from '../components/IconButton'
 import SmartHomeDemo from '../components/SmartHomeDemo'
 
 export default function Settings() {
@@ -14,21 +12,6 @@ export default function Settings() {
       {/* Lifestyle Baseline & Footprint */}
       <section className="space-y-3">
         <span className="font-bold">Lifestyle Baseline & Footprint</span>
-
-        {/* Carbon Baseline Setup */}
-        <div className="bg-[#E8F5E9]/60 p-5 rounded-3xl border border-emerald-100 flex items-center gap-5">
-          <div className="space-y-1 w-full">
-            <div className="flex items-center justify-between">
-              <h3 className="text-xl font-black text-gray-900 leading-tight">
-                Carbon Baseline Setup
-              </h3>
-              <IconButton navigate="/onboardCommute" onClick={() => window.scrollTo(0, 0)}>
-                <ChevronRight color="#657065" size={20} />
-              </IconButton>
-            </div>
-            <ProgressBar current={0} total={3} labelText="0% Completed" />
-          </div>
-        </div>
 
         {/* Onboarding Buttons */}
         <div className="flex flex-col bg-white border border-slate-200 rounded-2xl overflow-hidden">
@@ -98,10 +81,8 @@ export default function Settings() {
         </div>
       </section>
 
-      {/* Smart Home Demo (includes status banner + Philips Hue & Octopus Energy cards) */}
       <SmartHomeDemo />
 
-      {/* Log Out */}
       <Button variant="red" className="flex items-center justify-center gap-2" navigate="/">
         <LogOut size={20} />
         Log out
