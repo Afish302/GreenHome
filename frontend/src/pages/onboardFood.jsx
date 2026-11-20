@@ -65,14 +65,13 @@ export default function OnboardFood() {
   // saves the users answers
   function saveAnswers() {
     console.log(myID, diet, waste, localOrganic)
+    const id = myID
+    const food_waste = waste
+    const local_organic = localOrganic
+
     supabase
       .from('onboarding')
-      .upsert({
-        id: myID,
-        diet: diet,
-        food_waste: waste,
-        local_organic: localOrganic
-      })
+      .upsert({ id, diet, food_waste, local_organic })
       .then(function (result) {
         console.log(result)
       })
@@ -134,10 +133,6 @@ export default function OnboardFood() {
     <section className="w-full">
       <div className="w-full min-h-[14vh] bg-white shadow-md flex flex-col gap-3 px-8 py-4">
         <div className="w-full max-w-[904px] mx-auto flex flex-col gap-3">
-        <div className="flex items-center justify-center gap-2 py-2 rounded-full bg-[#EAF4E9] text-sm text-[var(--color-charcoal)]">
-          <Leaf className="text-[var(--color-forest)]" size={20} />
-          <span>Estimated Footprint: <span className="font-semibold text-[var(--color-forest)]">{estimatedFootprint} t CO₂e/yr</span></span>
-        </div>
         <Button navigate="/onboardHouse" onClick={function () { saveAnswers(); window.scrollTo(0, 0) }} className="!w-full !rounded-full">Continue to Household (2/3)</Button>
         </div>
       </div>

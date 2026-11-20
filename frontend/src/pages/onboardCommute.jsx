@@ -63,14 +63,14 @@ export default function CommuteAnswers() {
 
   // saves the users answers
   function saveAnswers() {
+    const id = myID
+    const daily_commute = commute
+    const avg_daily_travel = distance
+    const occupants = number
+
     supabase
       .from('onboarding')
-      .upsert({
-        id: myID,
-        daily_commute: commute,
-        avg_daily_travel: distance,
-        occupants: number
-      })
+      .upsert({ id, daily_commute, avg_daily_travel, occupants })
       .then(function (result) {
         console.log(result)
       })
@@ -97,14 +97,12 @@ export default function CommuteAnswers() {
             <BusFront className="text-[var(--color-forest-dark)]" size={24} />
             <span className="font-bold">Daily Commute</span>
           </div>
-
           <div className="grid grid-cols-2 gap-3">
             <OptionCard icon={<BusFront size={20} />} label="Public Transport" selected={commute == "public"} onClick={function () { updateCommute("public") }} />
             <OptionCard icon={<CarFront size={20} />} label="Electric Vehicle" selected={commute == "electric"} onClick={function () { updateCommute("electric") }} />
             <OptionCard icon={<Fuel size={20} />} label="Petrol Car" selected={commute == "petrol"} onClick={function () { updateCommute("petrol") }} />
             <OptionCard icon={<Bike size={20} />} label="Bicycle/Walking" selected={commute == "bike"} onClick={function () { updateCommute("bike") }} />
           </div>
-
           <div>
             <RangeSlider label="Average daily travel: " value={distance} min={0} max={50} type="km" onClick={updateDistance} />
           </div>
@@ -121,24 +119,6 @@ export default function CommuteAnswers() {
             <span>Number of occupants</span>
             <NumberStepper value={number} onClick={updateNumber} />
           </div>
-
-          <div className="flex items-center gap-3 px-4 py-3 bg-white border border-slate-200 rounded-2xl">
-            <Zap className="text-[var(--color-forest)]" size={24} />
-            <span className="text-2xl font-bold text-[var(--color-charcoal)]">{electricityUsage}</span>
-            <span className="ml-auto text-[var(--color-charcoal-muted)]">kWh</span>
-          </div>
-
-          <div className="flex items-center rounded-2xl bg-[#EAF4E9] overflow-hidden">
-            <Button variant="secondary" className="!w-auto flex-1 !px-4 !py-3 !shadow-none !rounded-none flex items-center gap-3">
-              <FileUp size={24} />
-              Upload utility bill
-            </Button>
-            <div className="w-px h-8 bg-[#81C784]"></div>
-            <Button variant="secondary" className="!w-auto !px-4 !py-3 !shadow-none !rounded-none flex items-center gap-3">
-              <ScanLine size={24} />
-              Scan
-            </Button>
-          </div>
         </section>
       </main>
     </div>
@@ -148,11 +128,7 @@ export default function CommuteAnswers() {
     <section className="w-full">
       <div className="w-full min-h-[14vh] bg-white shadow-md flex flex-col gap-3 px-8 py-4">
         <div className="w-full max-w-[904px] mx-auto flex flex-col gap-3">
-        <div className="flex items-center justify-center gap-2 py-2 rounded-full bg-[#EAF4E9] text-sm text-[var(--color-charcoal)]">
-          <Leaf className="text-[var(--color-forest)]" size={20} />
-          <span>Estimated Footprint: <span className="font-semibold text-[var(--color-forest)]">{estimatedFootprint} t CO₂e/yr</span></span>
-        </div>
-        <Button navigate="/onboardFood" onClick={function () { saveAnswers(); window.scrollTo(0, 0) }} className="!w-full !rounded-full">Save & Calculate Footprint</Button>
+        <Button navigate="/onboardFood" onClick={function () { saveAnswers(); window.scrollTo(0, 0) }} className="!w-full !rounded-full">Continue to Food (1/3)</Button>
         </div>
       </div>
     </section>
