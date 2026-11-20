@@ -68,14 +68,14 @@ export default function OnboardHouse() {
 
   // saves the users answers
   function saveAnswers() {
+    const id = myID
+    const household_type = home
+    const energy_usage = electricity
+    const green_energy = greenEnergy
+
     supabase
       .from('onboarding')
-      .upsert({
-        id: myID,
-        household_type: home,
-        energy_usage: electricity,
-        green_energy: greenEnergy
-      })
+      .upsert({ id, household_type, energy_usage, green_energy })
       .then(function (result) {
         console.log(result)
       })
@@ -128,18 +128,6 @@ export default function OnboardHouse() {
             <input type="checkbox" className="w-5 h-5" checked={greenEnergy} onChange={function (e) { updateGreenEnergy(e.target.checked) }} />
             My home uses green energy / solar power
           </label>
-
-          <div className="flex items-center rounded-2xl bg-[#EAF4E9] overflow-hidden mt-3">
-            <Button variant="secondary" className="!w-auto flex-1 !px-4 !py-3 !shadow-none !rounded-none flex items-center gap-3">
-              <FileUp size={24} />
-              Upload utility bill (optional)
-            </Button>
-            <div className="w-px h-8 bg-[#81C784]"></div>
-            <Button variant="secondary" className="!w-auto !px-4 !py-3 !shadow-none !rounded-none flex items-center gap-3">
-              <ScanLine size={24} />
-              Scan
-            </Button>
-          </div>
         </section>
       </main>
     </div>
@@ -149,10 +137,6 @@ export default function OnboardHouse() {
     <section className="w-full">
       <div className="w-full min-h-[14vh] bg-white shadow-md flex flex-col gap-3 px-8 py-4">
         <div className="w-full max-w-[904px] mx-auto flex flex-col gap-3">
-        <div className="flex items-center justify-center gap-2 py-2 rounded-full bg-[#EAF4E9] text-sm text-[var(--color-charcoal)]">
-          <Leaf className="text-[var(--color-forest)]" size={20} />
-          <span>Estimated Footprint: <span className="font-semibold text-[var(--color-forest)]">{estimatedFootprint} t CO₂e/yr</span></span>
-        </div>
         <Button navigate="/dashboard" onClick={function () { saveAnswers(); window.scrollTo(0, 0) }} className="!w-full !rounded-full">Complete Setup & Go to Dashboard (3/3)</Button>
         </div>
       </div>
